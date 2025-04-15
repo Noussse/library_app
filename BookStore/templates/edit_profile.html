@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Profile</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    body {
+      background-color: #F4F7FA;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 30px 0;
+    }
+
+    .profile-card {
+      max-width: 700px;
+      margin: 0 auto;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      background-color: white;
+      color: #333;
+      overflow: hidden;
+    }
+    
+    .profile-header {
+      background-color: #4A90E2;
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+    
+    .profile-header h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    .profile-pic-wrapper {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      overflow: hidden;
+      background-color: #dee2e6;
+      border: 5px solid white;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .profile-pic-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .profile-body {
+      padding: 2rem;
+    }
+
+    .form-control {
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      border: 1px solid #ddd;
+      padding: 10px 15px;
+    }
+    
+    .form-control:focus {
+      box-shadow: 0 0 0 0.2rem rgba(80, 227, 194, 0.25);
+      border-color: #50E3C2;
+    }
+
+    #profilePicInput {
+      display: none;
+    }
+
+    label[for="profilePicInput"] {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 16px;
+      background-color: #50E3C2;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    label[for="profilePicInput"]:hover {
+      background-color: #45d3b1;
+    }
+    
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #4A90E2;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+    }
+
+    .btn-success {
+      background-color: #4CAF50;
+      border-color: #4CAF50;
+    }
+
+    .btn-success:hover {
+      background-color: #45a049;
+    }
+
+    .btn-secondary {
+      background-color: #6c757d;
+      border-color: #6c757d;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #5a6268;
+    }
+    
+    .action-buttons {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="profile-card">
+      <div class="profile-header">
+        <h1><i class="fas fa-user-edit mr-2"></i>Edit Profile</h1>
+      </div>
+      
+      <div class="profile-body">
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <!-- Profile Picture Section -->
+          <div class="text-center mb-4">
+            <div class="profile-pic-wrapper mb-3">
+              <img src="{% if profile.profile_pic %}{{ profile.profile_pic.url }}{% else %}https://via.placeholder.com/150?text=Profile+Pic{% endif %}" alt="Profile Picture">
+            </div>
+            <input type="file" id="profilePicInput" name="profile_pic" accept="image/*">
+            <label for="profilePicInput"><i class="fas fa-camera mr-2"></i>Change Picture</label>
+          </div>
+
+          <!-- Editable Personal Details -->
+          <div class="profile-details mt-4">
+            <h4 class="section-title"><i class="fas fa-user-circle mr-2"></i>Personal Details</h4>
+            
+            <div class="form-group">
+              <label for="first_name">First Name</label>
+              <input type="text" id="first_name" name="first_name" class="form-control" value="{{ user.first_name }}" placeholder="First Name">
+            </div>
+            
+            <div class="form-group">
+              <label for="last_name">Last Name</label>
+              <input type="text" id="last_name" name="last_name" class="form-control" value="{{ user.last_name }}" placeholder="Last Name">
+            </div>
+            
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" class="form-control" value="{{ user.email }}" placeholder="Email">
+            </div>
+            
+            <div class="form-group">
+              <label for="phone">Phone</label>
+              <input type="text" id="phone" name="phone" class="form-control" value="{{ profile.phone }}" placeholder="Phone">
+            </div>
+
+            <div class="form-group">
+              <label for="address">Address</label>
+              <textarea id="address" name="address" class="form-control" rows="3" placeholder="Address">{{ profile.address }}</textarea>
+            </div>
+          </div>
+
+          <!-- Editable Account Details -->
+          <div class="profile-details mt-4">
+            <h4 class="section-title"><i class="fas fa-user-shield mr-2"></i>Account Details</h4>
+            
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" id="username" name="username" class="form-control" value="{{ user.username }}" placeholder="Username">
+            </div>
+
+            <div class="form-group">
+              <label for="password">New Password (Leave empty to keep current)</label>
+              <input type="password" id="password" name="password" class="form-control" placeholder="New Password">
+              <small class="form-text text-muted">Password must be at least 8 characters with letters, numbers, and symbols</small>
+            </div>
+          </div>
+
+          <!-- Save Buttons -->
+          <div class="action-buttons">
+            <button type="submit" class="btn btn-success btn-block mb-3"><i class="fas fa-save mr-2"></i>Save Changes</button>
+            
+            <a href="{% url 'profile' %}" class="btn btn-secondary btn-block"><i class="fas fa-times mr-2"></i>Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bootstrap Scripts -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.5/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  
+  <script>
+    // Preview uploaded image before submission
+    document.getElementById('profilePicInput').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.querySelector('.profile-pic-wrapper img').src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Profile</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    body {
+      background-color: #F4F7FA;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 30px 0;
+    }
+
+    .profile-card {
+      max-width: 700px;
+      margin: 0 auto;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      background-color: white;
+      color: #333;
+      overflow: hidden;
+    }
+    
+    .profile-header {
+      background-color: #4A90E2;
+      color: white;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .profile-pic-wrapper {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      overflow: hidden;
+      background-color: #dee2e6;
+      border: 5px solid white;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .profile-pic-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .profile-name {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 1.8rem;
+    }
+    
+    .profile-body {
+      padding: 2rem;
+    }
+
+    .info-section {
+      margin-bottom: 25px;
+    }
+    
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #4A90E2;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+    }
+    
+    .info-row {
+      display: flex;
+      margin-bottom: 10px;
+    }
+    
+    .info-label {
+      font-weight: 500;
+      width: 120px;
+      color: #666;
+    }
+    
+    .info-value {
+      flex: 1;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .btn-edit {
+      background-color: #50E3C2;
+      border-color: #50E3C2;
+      color: white;
+      flex: 1;
+    }
+    
+    .btn-edit:hover {
+      background-color: #45d3b1;
+    }
+    
+    .btn-logout {
+      background-color: #E94E77;
+      border-color: #E94E77;
+      color: white;
+      flex: 1;
+    }
+    
+    .btn-logout:hover {
+      background-color: #d6456c;
+    }
+    
+    .btn-home {
+      background-color: #4A90E2;
+      border-color: #4A90E2;
+      color: white;
+      flex: 1;
+    }
+    
+    .btn-home:hover {
+      background-color: #3a7bc8;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="profile-card">
+      <div class="profile-header">
+        <!-- Profile Picture -->
+        <div class="profile-pic-wrapper">
+          <img src="{% if profile.profile_pic %}{{ profile.profile_pic.url }}{% else %}https://via.placeholder.com/150?text=Profile+Pic{% endif %}" alt="Profile Picture">
+        </div>
+        <!-- Username -->
+        <div class="profile-name">
+          {{ user.username }}
+        </div>
+      </div>
+      
+      <div class="profile-body">
+        <!-- Personal Details Section -->
+        <div class="info-section">
+          <h4 class="section-title"><i class="fas fa-user-circle mr-2"></i>Personal Details</h4>
+          
+          <div class="info-row">
+            <div class="info-label">Full Name:</div>
+            <div class="info-value">{{ user.first_name }} {{ user.last_name }}</div>
+          </div>
+          
+          <div class="info-row">
+            <div class="info-label">Phone:</div>
+            <div class="info-value">{{ profile.phone|default:"Not specified" }}</div>
+          </div>
+          
+          <div class="info-row">
+            <div class="info-label">Address:</div>
+            <div class="info-value">{{ profile.address|default:"Not specified" }}</div>
+          </div>
+        </div>
+
+        <!-- Account Details Section -->
+        <div class="info-section">
+          <h4 class="section-title"><i class="fas fa-user-shield mr-2"></i>Account Details</h4>
+          
+          <div class="info-row">
+            <div class="info-label">Username:</div>
+            <div class="info-value">{{ user.username }}</div>
+          </div>
+          
+          <div class="info-row">
+            <div class="info-label">Email:</div>
+            <div class="info-value">{{ user.email|default:"Not specified" }}</div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <a href="{% url 'edit_profile' %}" class="btn btn-edit"><i class="fas fa-user-edit mr-2"></i>Edit Profile</a>
+          <a href="{% url 'home' %}" class="btn btn-home"><i class="fas fa-home mr-2"></i>Home</a>
+          <form action="{% url 'logout' %}" method="POST" style="flex: 1;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-logout w-100"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap Scripts -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.5/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
