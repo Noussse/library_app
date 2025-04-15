@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verify Code</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    body {
+      background-color: #F4F7FA;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .verify-card {
+      width: 100%;
+      max-width: 380px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      background-color: white;
+      padding: 25px;
+    }
+
+    .verify-title {
+      color: #4A90E2;
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .btn-success {
+      background-color: #4CAF50;
+      border-color: #4CAF50;
+    }
+
+    .btn-success:hover {
+      background-color: #45a049;
+    }
+    
+    .code-input {
+      letter-spacing: 4px;
+      font-size: 18px;
+      text-align: center;
+    }
+    
+    .code-info {
+      font-size: 0.8rem;
+      color: #6c757d;
+      margin-top: 5px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="verify-card">
+    <h2 class="verify-title">Verify Code</h2>
+
+    {% if messages %}
+      <div class="alert alert-danger">
+        <ul>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="code">Verification Code</label>
+        <input type="text" name="code" class="form-control code-input" id="code" placeholder="6-digit code" maxlength="6" required>
+        <div class="code-info">
+          Enter the 6-digit code sent to your WhatsApp
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-success btn-block mt-4">Verify Code</button>
+
+      <div class="text-center mt-3">
+        <a href="{% url 'forget_password' %}" class="text-primary">Request New Code</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Bootstrap Scripts -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.5/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('code').focus();
+    });
+    
+    
+    document.getElementById('code').addEventListener('input', function(e) {
+      this.value = this.value.replace(/[^0-9]/g, '');
+    });
+  </script>
+</body>
+</html>
