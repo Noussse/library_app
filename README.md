@@ -1,70 +1,28 @@
-# Book Store App
+# 📚 Online Bookstore
 
-Welcome to the **Book Store App**! This application is designed to help users browse, search, and manage books in a virtual bookstore.
+An online bookstore web application built with Django (Python), SQLite3, HTML, Bootstrap, and JavaScript. Users can browse books, register/login, and manage their profiles.
 
-## Features
+---
 
-- Browse a catalog of books by category.
-- Search for books by title, author, or ISBN.
-- Add books to a shopping cart.
-- User authentication for personalized experiences.
-- Admin panel for managing inventory.
+## 🚀 Features
 
-## Technologies Used
+- User registration and authentication
+- Profile management
+- Browse available books
+- Add/edit/delete books (admin)
+- Password reset via email code
+- Responsive design with Bootstrap
+- SQLite3 database
 
-- **Frontend**: React, Tailwind CSS
-- **Backend**: Node.js, Express.js
-- **Database**: MongoDB
-- **Authentication**: JSON Web Tokens (JWT)
+---
 
-## Installation
+## 🛠️ Tech Stack
 
-1. Clone the repository:
-    ```bash
-    git clone https://github.com/your-username/book-store-app.git
-    ```
-2. Navigate to the project directory:
-    ```bash
-    cd book-store-app
-    ```
-3. Install dependencies:
-    ```bash
-    npm install
-    ```
-4. Start the development server:
-    ```bash
-    npm start
-    ```
+- **Backend**: Django (Python)
+- **Frontend**: HTML5, CSS3, Bootstrap, JavaScript
+- **Database**: SQLite3
 
-## Usage
+---
 
-1. Open the app in your browser at `http://localhost:3000`.
-2. Browse the catalog or search for books.
-3. Add books to your cart and proceed to checkout.
+## 📁 Project Structure
 
-## Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository.
-2. Create a new branch:
-    ```bash
-    git checkout -b feature-name
-    ```
-3. Commit your changes:
-    ```bash
-    git commit -m "Add feature-name"
-    ```
-4. Push to your branch:
-    ```bash
-    git push origin feature-name
-    ```
-5. Open a pull request.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
-## Contact
-
-For questions or feedback, please contact [your-email@example.com].
