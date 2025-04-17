@@ -1,17 +1,8 @@
 from django import forms
-from django.contrib.auth.models import User
-from .models import Profile
+from django.contrib.auth.forms import UserChangeForm
+from .models import CustomUser  # Import the custom user model
 
-# Form for updating user details (name, email)
-class UserUpdateForm(forms.ModelForm):
+class UserUpdateForm(UserChangeForm):
     class Meta:
-        model = User
-        fields = ['username', 'email']
-
-# Form for updating profile details (phone, address, and profile picture)
-class ProfileUpdateForm(forms.ModelForm):
-    class Meta:
-        model = Profile
-        fields = ['profile_pic', 'phone', 'address']
-# forms.py
-
+        model = CustomUser
+        fields = ['username', 'first_name', 'last_name', 'email', 'profile_pic', 'phone', 'address']
