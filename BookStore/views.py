@@ -7,13 +7,11 @@ from django.contrib.auth import get_user_model
 import requests
 import random
 from django.contrib.auth.hashers import make_password
-from django.conf import settings
-from .models import Profile
-from .forms import ProfileUpdateForm, UserUpdateForm 
- 
+from .forms import UserUpdateForm  # Using UserUpdateForm instead of ProfileUpdateForm
 from .utils import check_password_strength  # Assuming you have utils.py with this function
 
 User = get_user_model()  # Use the custom user model
+verification_codes = {}
 
 # Password Strength Check View
 def check_password_view(request):
@@ -42,7 +40,6 @@ def register_user(request):
         email = request.POST.get('email')
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
-        
 
         if not verif_nom(username) or not email or not password1 or not password2:
             messages.error(request, "All fields are required.")
@@ -59,7 +56,6 @@ def register_user(request):
                 password=password1,
                 first_name=first_name,
                 last_name=last_name,
-                
             )
             user.save()
 
@@ -100,65 +96,42 @@ def user_logout(request):
     messages.success(request, "You have been logged out successfully!")
     return redirect('login')
 
-# External API Call
-def use_api(request):
-    url1 = "https://openlibrary.org/api/books?bibkeys=ISBN:0451526538&format=json&jscmd=data"
-    url2 = "https://openlibrary.org/api/books?bibkeys=ISBN:0140328726&format=json&jscmd=data"
-
-    response1 = requests.get(url1)
-    response2 = requests.get(url2)
-
-    book_data1 = response1.json().get("ISBN:0451526538", {}) if response1.status_code == 200 else {"error": "Failed to fetch"}
-    book_data2 = response2.json().get("ISBN:0140328726", {}) if response2.status_code == 200 else {"error": "Failed to fetch"}
-
-    return render(request, 'book.html', {'book1': book_data1, 'book': book_data2})
-
 # Profile View
 @login_required
 def profile_view(request):
-    user = request.user
-    profile = user.profile
+    user = request.user  # Use the user model directly
 
-    # Handle form submission for updating user details
     if request.method == 'POST':
-        # Create the forms with data from the request
-        user_form = UserUpdateForm(request.POST, instance=user)
-        profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
+        form = UserUpdateForm(request.POST, request.FILES, instance=user)
         
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
+        if form.is_valid():
+            form.save()
             messages.success(request, "Profile updated successfully.")
             return redirect('profile')
 
     else:
-        user_form = UserUpdateForm(instance=user)
-        profile_form = ProfileUpdateForm(instance=profile)
+        form = UserUpdateForm(instance=user)
 
     return render(request, 'profile.html', {
-        'user_form': user_form,
-        'profile_form': profile_form,
-        'user': user,
-        'profile': profile
+        'form': form,
+        'user': user  # Pass user directly to the template
     })
-
 
 @login_required
 def edit_profile(request):
-    profile = Profile.objects.get(user=request.user)
-    user = User.objects.get(username=request.user.username)
+    user = User.objects.get(username=request.user.username)  # Directly using User model
+    
     if request.method == 'POST':
-        form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
         form = UserUpdateForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
             return redirect('profile')  # Redirect to profile page after saving changes
     else:
-        form = ProfileUpdateForm(instance=profile)
         form = UserUpdateForm(instance=user)
-    return render(request, 'edit_profile.html', {'form': form, 'profile': profile})
-verification_codes = {}
+    
+    return render(request, 'edit_profile.html', {'form': form, 'user': user})
 
+# Forget password view
 def forget_password(request):
     if request.method == 'POST':
         phone = request.POST['phone']
@@ -181,14 +154,12 @@ def verify_code(request):
         else:
             messages.error(request, 'Invalid code.')
     return render(request, 'verify_code.html')
-import requests
 
 def send_whatsapp_message(phone, message):
     phone = "216" + phone  # Ensure the number is formatted correctly
     token = 'k668mspn3b8leltw'
     instance_id = 'instance114669'
     
-    # Token goes in the URL
     url = f"https://api.ultramsg.com/{instance_id}/messages/chat?token={token}"
 
     payload = {
@@ -205,6 +176,7 @@ def send_whatsapp_message(phone, message):
     response = requests.post(url, json=payload, headers=headers)
     print("📨 UltraMsg Response:", response.status_code, response.text)
     return response.json()
+
 def reset_password(request):
     phone = request.session.get('reset_phone')
     if not phone:
@@ -217,7 +189,7 @@ def reset_password(request):
             messages.error(request, "Passwords don't match.")
         else:
             try:
-                user = User.objects.get(profile__phone=phone)
+                user = User.objects.get(profile__phone=phone)  # Use the phone linked to the User
                 user.password = make_password(password1)
                 user.save()
                 messages.success(request, "Password reset successfully.")

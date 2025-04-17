@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -133,7 +134,7 @@
       <div class="profile-header">
         <!-- Profile Picture -->
         <div class="profile-pic-wrapper">
-          <img src="{% if profile.profile_pic %}{{ profile.profile_pic.url }}{% else %}https://via.placeholder.com/150?text=Profile+Pic{% endif %}" alt="Profile Picture">
+          <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}https://via.placeholder.com/150?text=Profile+Pic{% endif %}" alt="Profile Picture">
         </div>
         <!-- Username -->
         <div class="profile-name">
@@ -153,12 +154,12 @@
           
           <div class="info-row">
             <div class="info-label">Phone:</div>
-            <div class="info-value">{{ profile.phone|default:"Not specified" }}</div>
+            <div class="info-value">{{ user.phone|default:"Not specified" }}</div>
           </div>
           
           <div class="info-row">
             <div class="info-label">Address:</div>
-            <div class="info-value">{{ profile.address|default:"Not specified" }}</div>
+            <div class="info-value">{{ user.address|default:"Not specified" }}</div>
           </div>
         </div>
 
@@ -197,3 +198,4 @@
 
 </body>
 </html>
+```
