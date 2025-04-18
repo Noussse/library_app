@@ -1,8 +1,11 @@
 from django import forms
-from django.contrib.auth.forms import UserChangeForm
-from .models import CustomUser  # Import the custom user model
+from django.contrib.auth import get_user_model
 
-class UserUpdateForm(UserChangeForm):
+User = get_user_model()
+
+class UserUpdateForm(forms.ModelForm):
+    password = forms.CharField(required=False, widget=forms.PasswordInput())
+
     class Meta:
-        model = CustomUser
-        fields = ['username', 'first_name', 'last_name', 'email', 'profile_pic', 'phone', 'address']
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'phone', 'address', 'username', 'profile_pic', 'password']
