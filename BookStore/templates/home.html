@@ -37,11 +37,7 @@
                 {% for book in featured_books %}
                 <div class="book-item">
                     {% if book.cover_image %}
-                    <img src="{{ book.cover_image.url }}" class="book-cover w-100" alt="{{ book.title }}">
-                    {% elif book.cover_url %}
-                    <img src="{{ book.cover_url }}" class="book-cover w-100" alt="{{ book.title }}">
-                    {% else %}
-                    <img src="{% static 'library/images/default-cover.jpg' %}" class="book-cover w-100" alt="{{ book.title }}">
+                    <a href="{% url 'book_detail' book.id %}"><img src="{{ book.cover_image.url }}" class="book-cover w-100" alt="{{ book.title }}"></a>
                     {% endif %}
                     <h5 class="book-title">{{ book.title }}</h5>
                     <p class="book-author">
@@ -81,14 +77,14 @@
         <div class="row g-4">
             {% for genre in popular_genres %}
             <div class="col-lg-3 col-md-4 col-sm-6">
-                <div class="card genre-card text-center h-100 py-4">
-                    <div class="card-body">
-                        <i class="fas {{ genre.icon }} genre-icon text-{{ genre.color }}"></i>
-                        <h5 class="card-title">{{ genre.name }}</h5>
-                        <p class="card-text text-muted">{{ genre.books.count }} Books</p>
-                        <a href="{% url 'genre_books' genre.id %}" class="stretched-link"></a>
+                <a href="{% url 'browse_books' %}?genre={{ genre.id }}" class="text-decoration-none">
+                    <div class="card genre-card text-center h-100 py-4">
+                        <div class="card-body">
+                            <i class="fas {{ genre.icon }} genre-icon text-{{ genre.color }}"></i>
+                            <h5 class="card-title">{{ genre.name }}</h5>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             {% empty %}
             <div class="col text-center py-4">
@@ -112,11 +108,7 @@
                 {% for book in recent_books %}
                 <div class="book-item">
                     {% if book.cover_image %}
-                    <img src="{{ book.cover_image.url }}" class="book-cover w-100" alt="{{ book.title }}">
-                    {% elif book.cover_url %}
-                    <img src="{{ book.cover_url }}" class="book-cover w-100" alt="{{ book.title }}">
-                    {% else %}
-                    <img src="{% static 'library/images/default-cover.jpg' %}" class="book-cover w-100" alt="{{ book.title }}">
+                    <a href="{% url 'book_detail' book.id %}"><img src="{{ book.cover_image.url }}" class="book-cover w-100" alt="{{ book.title }}"> </a>
                     {% endif %}
                     <h5 class="book-title">{{ book.title }}</h5>
                     <p class="book-author">
@@ -159,7 +151,6 @@
                 <div class="text-center">
                     <h5>{{ author.name }}</h5>
                     <p class="text-muted">{{ author.books.count }} Books</p>
-                    <a href="{% url 'author_books' author.id %}" class="btn btn-sm btn-outline-dark">View Books</a>
                 </div>
             </div>
             {% empty %}

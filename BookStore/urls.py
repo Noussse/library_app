@@ -21,17 +21,8 @@ urlpatterns = [
     # Book detail
     path('book/<int:book_id>/', views.book_detail, name='book_detail'),
     
-    # Author books
-    path('author/<int:author_id>/', views.author_books, name='author_books'),
-    
-    # Genre books
-    path('genre/<int:genre_id>/', views.genre_books, name='genre_books'),
-    
-    
     # Browse pages
     path('browse/', views.browse_books, name='browse_books'),
-    path('authors/', views.browse_authors, name='browse_authors'),
-    path('genres/', views.browse_genres, name='browse_genres'),
     path('books/', views.browse_books, name='browse_books'),
 
 ]

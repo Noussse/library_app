@@ -167,12 +167,6 @@
                     <li class="nav-item">
                         <a class="nav-link {% if request.resolver_match.url_name == 'browse_books' %}active{% endif %}" href="{% url 'browse_books' %}">Browse</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'browse_authors' %}active{% endif %}" href="{% url 'browse_authors' %}">Authors</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'browse_genres' %}active{% endif %}" href="{% url 'browse_genres' %}">Genres</a>
-                    </li>
                 </ul>
                 <div class="d-flex align-items-center">
                     {% if user.is_authenticated %}
@@ -219,8 +213,6 @@
                     <ul class="list-unstyled">
                         <li><a href="{% url 'home' %}" class="text-white">Home</a></li>
                         <li><a href="{% url 'browse_books' %}" class="text-white">Browse</a></li>
-                        <li><a href="{% url 'browse_authors' %}" class="text-white">Authors</a></li>
-                        <li><a href="{% url 'browse_genres' %}" class="text-white">Genres</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-2 col-md-4">

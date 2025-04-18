@@ -238,39 +238,24 @@ def home(request):
 # Book Detail View
 def book_detail(request, book_id):
     """
-    View function for the book detail page.
+    View function to display details of a specific book.
     """
-    book = get_object_or_404(Book, pk=book_id)
+    # Get the book or return 404 if not found
+    book = get_object_or_404(Book, id=book_id)
+    
+    # Get related books (same genre or author)
+    related_books = Book.objects.filter(
+        Q(genres__in=book.genres.all()) | 
+        Q(authors__in=book.authors.all())
+    ).exclude(id=book.id).distinct()[:4]  # Limit to 4 related books
+    
     context = {
         'book': book,
+        'related_books': related_books,
     }
+    
     return render(request, 'book_detail.html', context)
 
-# Author Books View
-def author_books(request, author_id):
-    """
-    View function to display all books by an author.
-    """
-    author = get_object_or_404(Author, pk=author_id)
-    books = author.books.all()
-    context = {
-        'author': author,
-        'books': books,
-    }
-    return render(request, 'author_books.html', context)
-
-# Genre Books View
-def genre_books(request, genre_id):
-    """
-    View function to display all books in a genre.
-    """
-    genre = get_object_or_404(Genre, pk=genre_id)
-    books = genre.books.all()
-    context = {
-        'genre': genre,
-        'books': books,
-    }
-    return render(request, 'genre_books.html', context)
 
 def browse_books(request):
     """
@@ -319,24 +304,4 @@ def browse_books(request):
     
     return render(request, 'browse_books.html', context)
 
-# Browse Authors View
-def browse_authors(request):
-    """
-    View function to browse all authors.
-    """
-    authors = Author.objects.all().order_by('name')
-    context = {
-        'authors': authors,
-    }
-    return render(request, 'browse_authors.html', context)
 
-# Browse Genres View (added to match URL pattern)
-def browse_genres(request):
-    """
-    View function to browse all genres.
-    """
-    genres = Genre.objects.annotate(book_count=Count('books')).order_by('name')
-    context = {
-        'genres': genres,
-    }
-    return render(request, 'browse_genres.html', context)

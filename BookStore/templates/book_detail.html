@@ -1,0 +1,428 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ book.title }} - BookHub Library{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'browse_books' %}" class="text-decoration-none">Browse Books</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ book.title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Book Detail Section -->
+    <div class="row">
+        <!-- Book Cover and Quick Actions -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow">
+                <div class="book-detail-cover-wrapper">
+                    {% if book.cover_image %}
+                    <img src="{{ book.cover_image.url }}" class="card-img-top book-detail-cover" alt="{{ book.title }}">
+                    {% elif book.cover_url %}
+                    <img src="{{ book.cover_url }}" class="card-img-top book-detail-cover" alt="{{ book.title }}">
+                    {% else %}
+                    <img src="{% static 'library/images/default-cover.jpg' %}" class="card-img-top book-detail-cover" alt="{{ book.title }}">
+                    {% endif %}
+                </div>
+                <div class="card-body text-center">
+                    <div class="d-grid gap-2 mb-3">
+                        <button class="btn btn-primary btn-lg" type="button">
+                            <i class="fas fa-shopping-cart me-2"></i> Add to Cart
+                        </button>
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="far fa-bookmark me-2"></i> Save to Reading List
+                        </button>
+                    </div>
+                    <div class="d-flex justify-content-center gap-2">
+                        <button class="btn btn-sm btn-outline-dark">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-dark">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-dark">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Book Availability -->
+            <div class="card border-0 shadow mt-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Availability</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Physical Copy</span>
+                            <span class="badge bg-success rounded-pill">Available</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>E-Book</span>
+                            <span class="badge bg-success rounded-pill">Available</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Audiobook</span>
+                            <span class="badge bg-secondary rounded-pill">Unavailable</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Book Details -->
+        <div class="col-md-8">
+            <div class="card border-0 shadow mb-4">
+                <div class="card-body p-4">
+                    <h1 class="h2 mb-1">{{ book.title }}</h1>
+                    <p class="mb-2">
+                        {% for author in book.authors.all %}
+                        <a href="#" class="text-decoration-none">{{ author.name }}</a>{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="ratings me-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star-half-alt text-warning"></i>
+                            <span class="text-muted ms-1">(4.5)</span>
+                        </div>
+                        <div class="ms-3">
+                            <span class="text-muted">{{ book.reviews_count|default:"0" }} reviews</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="row g-3">
+                            {% if book.published_year %}
+                            <div class="col-6 col-md-4">
+                                <div class="bg-light rounded p-3 h-100">
+                                    <div class="small text-muted">Publication Year</div>
+                                    <div class="fw-bold">{{ book.published_year }}</div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if book.isbn %}
+                            <div class="col-6 col-md-4">
+                                <div class="bg-light rounded p-3 h-100">
+                                    <div class="small text-muted">ISBN</div>
+                                    <div class="fw-bold">{{ book.isbn }}</div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if book.page_count %}
+                            <div class="col-6 col-md-4">
+                                <div class="bg-light rounded p-3 h-100">
+                                    <div class="small text-muted">Pages</div>
+                                    <div class="fw-bold">{{ book.page_count }}</div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if book.language %}
+                            <div class="col-6 col-md-4">
+                                <div class="bg-light rounded p-3 h-100">
+                                    <div class="small text-muted">Language</div>
+                                    <div class="fw-bold">{{ book.language }}</div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if book.publisher %}
+                            <div class="col-6 col-md-4">
+                                <div class="bg-light rounded p-3 h-100">
+                                    <div class="small text-muted">Publisher</div>
+                                    <div class="fw-bold">{{ book.publisher }}</div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Genres/Tags -->
+                    <div class="mb-4">
+                        <h5>Genres</h5>
+                        <div>
+                            {% for genre in book.genres.all %}
+                            <a href="{% url 'browse_books' %}?genre={{ genre.id }}" class="text-decoration-none">
+                                <span class="badge bg-light text-dark border me-1 mb-1 p-2">{{ genre.name }}</span>
+                            </a>
+                            {% empty %}
+                            <span class="text-muted">No genres specified</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <h5>Description</h5>
+                        <div class="book-description">
+                            {% if book.description %}
+                            <p>{{ book.description }}</p>
+                            {% else %}
+                            <p class="text-muted">No description available for this book.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="card border-0 shadow mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Reader Reviews</h5>
+                    <button class="btn btn-sm btn-outline-primary">Write a Review</button>
+                </div>
+                <div class="card-body">
+                    <!-- Review Summary -->
+                    <div class="row align-items-center mb-4">
+                        <div class="col-md-3 text-center">
+                            <div class="display-4 fw-bold text-primary">4.5</div>
+                            <div class="ratings mb-2">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star-half-alt text-warning"></i>
+                            </div>
+                            <div class="text-muted small">Based on {{ book.reviews_count|default:"25" }} reviews</div>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="mb-2 d-flex align-items-center">
+                                <div class="small me-3 text-nowrap">5 <i class="fas fa-star text-muted"></i></div>
+                                <div class="progress flex-grow-1" style="height: 8px;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 65%"></div>
+                                </div>
+                                <div class="small ms-3 text-nowrap text-muted">65%</div>
+                            </div>
+                            <div class="mb-2 d-flex align-items-center">
+                                <div class="small me-3 text-nowrap">4 <i class="fas fa-star text-muted"></i></div>
+                                <div class="progress flex-grow-1" style="height: 8px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 25%"></div>
+                                </div>
+                                <div class="small ms-3 text-nowrap text-muted">25%</div>
+                            </div>
+                            <div class="mb-2 d-flex align-items-center">
+                                <div class="small me-3 text-nowrap">3 <i class="fas fa-star text-muted"></i></div>
+                                <div class="progress flex-grow-1" style="height: 8px;">
+                                    <div class="progress-bar bg-info" role="progressbar" style="width: 7%"></div>
+                                </div>
+                                <div class="small ms-3 text-nowrap text-muted">7%</div>
+                            </div>
+                            <div class="mb-2 d-flex align-items-center">
+                                <div class="small me-3 text-nowrap">2 <i class="fas fa-star text-muted"></i></div>
+                                <div class="progress flex-grow-1" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 2%"></div>
+                                </div>
+                                <div class="small ms-3 text-nowrap text-muted">2%</div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="small me-3 text-nowrap">1 <i class="fas fa-star text-muted"></i></div>
+                                <div class="progress flex-grow-1" style="height: 8px;">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 1%"></div>
+                                </div>
+                                <div class="small ms-3 text-nowrap text-muted">1%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Reviews -->
+                    <h6 class="mb-3">Top Reviews</h6>
+                    <div class="review-item mb-4 pb-4 border-bottom">
+                        <div class="d-flex mb-2">
+                            <div class="flex-grow-1 ms-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Jane Smith</h6>
+                                        <div class="small text-muted">March 15, 2025</div>
+                                    </div>
+                                    <div class="ratings">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                    </div>
+                                </div>
+                                <p class="mt-2 mb-1">This book transformed my understanding of the subject. The author's prose is elegant and captivating, making complex ideas accessible without oversimplification.</p>
+                                <div class="d-flex align-items-center">
+                                    <button class="btn btn-sm btn-link text-muted p-0"><i class="far fa-thumbs-up me-1"></i> 24</button>
+                                    <span class="mx-2 text-muted">|</span>
+                                    <button class="btn btn-sm btn-link text-muted p-0"><i class="far fa-comment me-1"></i> Reply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="review-item mb-4">
+                        <div class="d-flex mb-2">
+                            <div class="flex-grow-1 ms-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Michael Johnson</h6>
+                                        <div class="small text-muted">February 28, 2025</div>
+                                    </div>
+                                    <div class="ratings">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="far fa-star text-warning"></i>
+                                    </div>
+                                </div>
+                                <p class="mt-2 mb-1">A compelling read that kept me engaged throughout. The character development is masterful, though the ending felt slightly rushed. Still, I highly recommend it to anyone interested in this genre.</p>
+                                <div class="d-flex align-items-center">
+                                    <button class="btn btn-sm btn-link text-muted p-0"><i class="far fa-thumbs-up me-1"></i> 16</button>
+                                    <span class="mx-2 text-muted">|</span>
+                                    <button class="btn btn-sm btn-link text-muted p-0"><i class="far fa-comment me-1"></i> Reply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="#" class="btn btn-outline-primary">View All Reviews</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Books Section -->
+    <div class="mt-5">
+        <h3 class="mb-4">You Might Also Like</h3>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+            {% for book in related_books %}
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm book-card">
+                    <a href="{% url 'book_detail' book.id %}" class="text-decoration-none">
+                        <div class="position-relative book-cover-wrapper">
+                            {% if book.cover_image %}
+                            <img src="{{ book.cover_image.url }}" class="card-img-top book-cover" alt="{{ book.title }}">
+                            {% elif book.cover_url %}
+                            <img src="{{ book.cover_url }}" class="card-img-top book-cover" alt="{{ book.title }}">
+                            {% else %}
+                            <img src="{% static 'library/images/default-cover.jpg' %}" class="card-img-top book-cover" alt="{{ book.title }}">
+                            {% endif %}
+                            <div class="book-hover-overlay">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    <span class="btn btn-sm btn-primary">View Details</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title mb-1">
+                            <a href="{% url 'book_detail' book.id %}" class="text-decoration-none text-dark">{{ book.title }}</a>
+                        </h5>
+                        <p class="card-text mb-0">
+                            {% for author in book.authors.all %}
+                            <a href="#" class="text-decoration-none text-muted">{{ author.name }}</a>{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <p class="text-muted">No related books found.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .book-detail-cover {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+    }
+    
+    .book-detail-cover-wrapper {
+        overflow: hidden;
+        border-top-left-radius: 0.25rem;
+        border-top-right-radius: 0.25rem;
+    }
+    
+    .book-cover {
+        height: 220px;
+        object-fit: cover;
+        transition: all 0.3s;
+    }
+    
+    .book-card {
+        transition: all 0.3s ease;
+    }
+    
+    .book-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+    }
+    
+    .book-cover-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .book-hover-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        opacity: 0;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .book-card:hover .book-hover-overlay {
+        opacity: 1;
+    }
+    
+    .ratings {
+        font-size: 0.8rem;
+    }
+    
+    .book-description {
+        line-height: 1.7;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 767px) {
+        .book-detail-cover {
+            max-height: 400px;
+            width: auto;
+            margin: 0 auto;
+            display: block;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    });
+</script>
+{% endblock %}
