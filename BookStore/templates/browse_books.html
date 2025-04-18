@@ -12,45 +12,58 @@
             <p class="lead text-muted">Discover thousands of books across genres, from timeless classics to contemporary bestsellers.</p>
         </div>
         <div class="col-lg-4">
-            <form action="{% url 'browse_books' %}" method="get" class="mb-4">
+            <form action="{% url 'browse_books' %}" method="get" class="mb-4" id="searchForm">
                 <div class="input-group input-group-lg shadow-sm">
                     <input type="text" name="search" class="form-control" placeholder="Search books or authors..." value="{{ request.GET.search|default:'' }}">
                     <button class="btn btn-primary" type="submit">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
+                <!-- Hidden inputs to preserve all genre filters -->
+                {% for genre_id in selected_genres %}
+                    <input type="hidden" name="genre" value="{{ genre_id }}">
+                {% endfor %}
+                <!-- Preserve sort parameter -->
+                {% if request.GET.sort %}
+                    <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+                {% endif %}
             </form>
         </div>
     </div>
 
-    <div class="row g-4">
-        <!-- Filters Sidebar -->
+    <!-- Main Content Row -->
+    <div class="row">
+        <!-- Sidebar Filters -->
         <div class="col-md-4 col-lg-3">
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-white py-3">
                     <h5 class="mb-0">Filter by Genre</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{% url 'browse_books' %}" method="get">
-                        {% if request.GET.search %}
-                        <input type="hidden" name="search" value="{{ request.GET.search }}">
+                    <form action="{% url 'browse_books' %}" method="get" id="genreFilterForm">
+                        <!-- Preserve search query -->
+                        {% if search_query %}
+                            <input type="hidden" name="search" value="{{ search_query }}">
                         {% endif %}
-
+                        
+                        <!-- Preserve sort parameter -->
+                        {% if request.GET.sort %}
+                            <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+                        {% endif %}
+        
                         <div class="mb-3">
                             {% for genre in all_genres %}
-                            <div class="form-check py-1">
-                                <input class="form-check-input" type="checkbox" name="genre" value="{{ genre.id }}" id="genre{{ genre.id }}" 
-                                    {% with genre_id_str=genre.id|stringformat:"i" %}
-                                    {% for g in request.GET.getlist %}
-                                    {% if g == genre_id_str %}checked{% endif %}
-                                    {% endfor %}
-                                    {% endwith %}>
-                                <label class="form-check-label d-flex justify-content-between" for="genre{{ genre.id }}">
-                                    {{ genre.name }}
-                                </label>
-                            </div>
+                                <div class="form-check py-1">
+                                    <input class="form-check-input" type="checkbox" name="genre" value="{{ genre.id }}" id="genre{{ genre.id }}"
+                                        {% if genre.id in selected_genres %}checked{% endif %}>
+                                    <label class="form-check-label d-flex justify-content-between" for="genre{{ genre.id }}">
+                                        {{ genre.name }}
+                                        <span class="badge bg-light text-dark">{{ genre.book_count }}</span>
+                                    </label>
+                                </div>
                             {% endfor %}
                         </div>
+        
                         <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
                         <div class="text-center mt-2">
                             <a href="{% url 'browse_books' %}" class="btn btn-link btn-sm">Clear all filters</a>
@@ -58,7 +71,7 @@
                     </form>
                 </div>
             </div>
-            
+
             <!-- Reading Lists Promo -->
             <div class="card border-0 shadow-sm bg-light">
                 <div class="card-body">
@@ -78,20 +91,66 @@
                         Showing {{ books.start_index }} to {{ books.end_index }} of {{ books.paginator.count }} books
                     </p>
                 </div>
-            </div>
-
-            {% if request.GET.search %}
-            <div class="alert alert-info mb-4">
-                <div class="d-flex align-items-center">
-                    <div>
-                        <strong>Search results for:</strong> "{{ request.GET.search }}"
-                    </div>
-                    <div class="ms-auto">
-                        <a href="{% url 'browse_books' %}" class="btn btn-sm btn-outline-dark">Clear search</a>
-                    </div>
+                
+                <!-- Sort Options - Only showing implemented options -->
+                <div>
+                    <form class="d-inline-flex" method="get" action="{% url 'browse_books' %}" id="sortForm">
+                        <!-- Preserve search parameter -->
+                        {% if search_query %}
+                            <input type="hidden" name="search" value="{{ search_query }}">
+                        {% endif %}
+                        
+                        <!-- Preserve all genre parameters -->
+                        {% for genre_id in selected_genres %}
+                            <input type="hidden" name="genre" value="{{ genre_id }}">
+                        {% endfor %}
+                        
+                        <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="recent" {% if request.GET.sort == 'recent' %}selected{% endif %}>Most Recent</option>
+                            <option value="title" {% if request.GET.sort == 'title' %}selected{% endif %}>Title (A-Z)</option>
+                        </select>
+                    </form>
                 </div>
             </div>
-            {% endif %}
+
+            <!-- Active Filters Display -->
+            <div class="mb-4">
+                {% if search_query or selected_genres %}
+                <div class="alert alert-info">
+                    <div class="d-flex flex-wrap align-items-center">
+                        <div>
+                            {% if search_query %}
+                                <span class="me-3 mb-2 d-inline-block">
+                                    <strong>Search:</strong> "{{ search_query }}"
+                                    <a href="?{% for genre_id in selected_genres %}&genre={{ genre_id }}{% endfor %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="text-decoration-none ms-2">
+                                        <i class="fas fa-times-circle"></i>
+                                    </a>
+                                </span>
+                            {% endif %}
+                            
+                            {% if selected_genres %}
+                                <strong class="me-2">Genres:</strong>
+                                {% for genre_id in selected_genres %}
+                                    {% for genre in all_genres %}
+                                        {% if genre.id == genre_id %}
+                                            <span class="badge bg-primary me-1 mb-1">
+                                                {{ genre.name }}
+                                                <a href="?{% if search_query %}search={{ search_query }}{% endif %}{% for g_id in selected_genres %}{% if g_id != genre_id %}&genre={{ g_id }}{% endif %}{% endfor %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="text-white text-decoration-none ms-1">
+                                                    <i class="fas fa-times"></i>
+                                                </a>
+                                            </span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="ms-auto mt-2">
+                            <a href="{% url 'browse_books' %}" class="btn btn-sm btn-outline-dark">Clear all</a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
 
             <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3 mb-4">
                 {% for book in books %}
@@ -157,7 +216,7 @@
                 <ul class="pagination justify-content-center">
                     {% if books.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ books.previous_page_number }}{% for genre_id in request.GET.genre %}&genre={{ genre_id }}{% endfor %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Previous">
+                        <a class="page-link" href="?page={{ books.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% for genre_id in selected_genres %}&genre={{ genre_id }}{% endfor %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
@@ -172,14 +231,14 @@
                         <li class="page-item active"><span class="page-link">{{ num }}</span></li>
                         {% elif num > books.number|add:'-3' and num < books.number|add:'3' %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ num }}{% for genre_id in request.GET.genre %}&genre={{ genre_id }}{% endfor %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">{{ num }}</a>
+                            <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% for genre_id in selected_genres %}&genre={{ genre_id }}{% endfor %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">{{ num }}</a>
                         </li>
                         {% endif %}
                     {% endfor %}
 
                     {% if books.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ books.next_page_number }}{% for genre_id in request.GET.genre %}&genre={{ genre_id }}{% endfor %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Next">
+                        <a class="page-link" href="?page={{ books.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% for genre_id in selected_genres %}&genre={{ genre_id }}{% endfor %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>

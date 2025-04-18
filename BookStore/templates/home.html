@@ -141,27 +141,6 @@
     </div>
 </section>
 
-<!-- Popular Authors Section -->
-<section class="py-5 author-section">
-    <div class="container">
-        <h2 class="section-title mb-4">Popular Authors</h2>
-        <div class="row g-4">
-            {% for author in popular_authors %}
-            <div class="col-lg-3 col-md-4 col-sm-6">
-                <div class="text-center">
-                    <h5>{{ author.name }}</h5>
-                    <p class="text-muted">{{ author.books.count }} Books</p>
-                </div>
-            </div>
-            {% empty %}
-            <div class="col text-center py-4">
-                <p>No authors available yet.</p>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-
 <!-- Call to Action Section -->
 <section class="py-5 bg-primary text-white text-center">
     <div class="container">

@@ -261,47 +261,52 @@ def browse_books(request):
     """
     View function to browse all books with filtering, sorting, and pagination.
     """
-    # Get all books, potentially with prefetch_related for authors
     queryset = Book.objects.all().prefetch_related('authors')
-    
+   
     # Handle search
     search_query = request.GET.get('search', '')
     if search_query:
         queryset = queryset.filter(
-            Q(title__icontains=search_query) | 
+            Q(title__icontains=search_query) |
             Q(authors__name__icontains=search_query)
         ).distinct()
-    
+   
     # Handle genre filtering
     genre_ids = request.GET.getlist('genre')
     if genre_ids:
         queryset = queryset.filter(genres__id__in=genre_ids).distinct()
-    
-    
+        
+    # Handle sorting
+    sort_by = request.GET.get('sort', 'recent')
+    if sort_by == 'title':
+        queryset = queryset.order_by('title')
+    elif sort_by == 'recent':
+        # Use published_year for sorting by most recent
+        queryset = queryset.order_by('-published_year')
+    # Note: We're removing 'rating' and 'popular' options as they're not implemented
+   
     # Get all genres for the filter sidebar with count annotation
     all_genres = Genre.objects.annotate(book_count=Count('books'))
-    
+   
     # Convert genre_ids to integers for easier comparison in template
     selected_genres = [int(g_id) for g_id in genre_ids if g_id.isdigit()]
-    
+   
     # Set up pagination
     paginator = Paginator(queryset, 12)  # 12 books per page
     page = request.GET.get('page', 1)
-    
+   
     try:
         books = paginator.page(page)
     except PageNotAnInteger:
         books = paginator.page(1)
     except EmptyPage:
         books = paginator.page(paginator.num_pages)
-    
+   
     context = {
         'books': books,
         'all_genres': all_genres,
         'selected_genres': selected_genres,
         'search_query': search_query,
     }
-    
+   
     return render(request, 'browse_books.html', context)
-
-
