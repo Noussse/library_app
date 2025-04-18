@@ -27,8 +27,6 @@ urlpatterns = [
     # Genre books
     path('genre/<int:genre_id>/', views.genre_books, name='genre_books'),
     
-    # Search
-    path('search/', views.search_books, name='search_books'),
     
     # Browse pages
     path('browse/', views.browse_books, name='browse_books'),

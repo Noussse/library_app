@@ -11,9 +11,9 @@
             <div class="col-lg-6 mb-4 mb-lg-0">
                 <h1 class="display-5 fw-bold mb-3">Discover Your Next Great Read</h1>
                 <p class="lead mb-4">Explore our vast collection of books, authors, and genres all in one place.</p>
-                <form action="{% url 'search_books' %}" method="get">
+                <form action="{% url 'browse_books' %}" method="get">
                     <div class="input-group mb-3">
-                        <input type="text" name="q" class="form-control search-box" placeholder="Search for books, authors, or genres...">
+                        <input type="text" name="search" class="form-control search-box" placeholder="Search for books ...">
                         <button class="btn btn-primary search-button" type="submit">
                             <i class="fas fa-search"></i>
                         </button>

@@ -272,36 +272,6 @@ def genre_books(request, genre_id):
     }
     return render(request, 'genre_books.html', context)
 
-# Search Books View
-def search_books(request):
-    """
-    View function to search for books by title, author, or genre.
-    """
-    query = request.GET.get('q', '')
-    
-    if query:
-        # Search in titles
-        title_results = Book.objects.filter(title__icontains=query)
-        
-        # Search in authors
-        author_results = Book.objects.filter(authors__name__icontains=query)
-        
-        # Search in genres
-        genre_results = Book.objects.filter(genres__name__icontains=query)
-        
-        # Combine results and remove duplicates
-        results = title_results.union(author_results, genre_results)
-    else:
-        results = Book.objects.none()
-    
-    context = {
-        'query': query,
-        'results': results,
-    }
-    
-    return render(request, 'search_results.html', context)
-
-
 def browse_books(request):
     """
     View function to browse all books with filtering, sorting, and pagination.
