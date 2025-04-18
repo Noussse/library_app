@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Browse Books - BookHub Library{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-lg-8">
+            <h1 class="display-4 fw-bold mb-3">Explore Our Collection</h1>
+            <p class="lead text-muted">Discover thousands of books across genres, from timeless classics to contemporary bestsellers.</p>
+        </div>
+        <div class="col-lg-4">
+            <form action="{% url 'browse_books' %}" method="get" class="mb-4">
+                <div class="input-group input-group-lg shadow-sm">
+                    <input type="text" name="search" class="form-control" placeholder="Search books or authors..." value="{{ request.GET.search|default:'' }}">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Filters Sidebar -->
+        <div class="col-md-4 col-lg-3">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Filter by Genre</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{% url 'browse_books' %}" method="get">
+                        {% if request.GET.search %}
+                        <input type="hidden" name="search" value="{{ request.GET.search }}">
+                        {% endif %}
+
+                        <div class="mb-3">
+                            {% for genre in all_genres %}
+                            <div class="form-check py-1">
+                                <input class="form-check-input" type="checkbox" name="genre" value="{{ genre.id }}" id="genre{{ genre.id }}" 
+                                    {% with genre_id_str=genre.id|stringformat:"i" %}
+                                    {% for g in request.GET.getlist %}
+                                    {% if g == genre_id_str %}checked{% endif %}
+                                    {% endfor %}
+                                    {% endwith %}>
+                                <label class="form-check-label d-flex justify-content-between" for="genre{{ genre.id }}">
+                                    {{ genre.name }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                        <div class="text-center mt-2">
+                            <a href="{% url 'browse_books' %}" class="btn btn-link btn-sm">Clear all filters</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Reading Lists Promo -->
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">Create Reading Lists</h5>
+                    <p class="card-text">Organize your favorite books and track your reading journey.</p>
+                    <a href="#" class="btn btn-sm btn-outline-primary">Learn More</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Books Grid -->
+        <div class="col-md-8 col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="m-0">Browse Books</h4>
+                    <p class="text-muted mb-0">
+                        Showing {{ books.start_index }} to {{ books.end_index }} of {{ books.paginator.count }} books
+                    </p>
+                </div>
+            </div>
+
+            {% if request.GET.search %}
+            <div class="alert alert-info mb-4">
+                <div class="d-flex align-items-center">
+                    <div>
+                        <strong>Search results for:</strong> "{{ request.GET.search }}"
+                    </div>
+                    <div class="ms-auto">
+                        <a href="{% url 'browse_books' %}" class="btn btn-sm btn-outline-dark">Clear search</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3 mb-4">
+                {% for book in books %}
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm book-card">
+                        <a href="{% url 'book_detail' book.id %}" class="text-decoration-none">
+                            <div class="position-relative book-cover-wrapper">
+                                {% if book.cover_image %}
+                                <img src="{{ book.cover_image.url }}" class="card-img-top book-cover" alt="{{ book.title }}">
+                                {% elif book.cover_url %}
+                                <img src="{{ book.cover_url }}" class="card-img-top book-cover" alt="{{ book.title }}">
+                                {% else %}
+                                <img src="{% static 'library/images/default-cover.jpg' %}" class="card-img-top book-cover" alt="{{ book.title }}">
+                                {% endif %}
+                                <div class="book-hover-overlay">
+                                    <div class="d-flex justify-content-center align-items-center h-100">
+                                        <span class="btn btn-sm btn-primary">View Details</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title mb-1">
+                                <a href="{% url 'book_detail' book.id %}" class="text-decoration-none text-dark">{{ book.title }}</a>
+                            </h5>
+                            <p class="card-text mb-1">
+                                {% for author in book.authors.all %}
+                                <a href="#" class="text-decoration-none text-muted">{{ author.name }}</a>{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                            {% if book.published_year %}
+                            <p class="card-text small text-muted">{{ book.published_year }}</p>
+                            {% endif %}
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <div class="ratings">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star-half-alt text-warning"></i>
+                                    <span class="small text-muted">(4.5)</span>
+                                </div>
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="far fa-bookmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center py-5">
+                        <i class="fas fa-book-open fa-3x mb-3"></i>
+                        <h4>No books found</h4>
+                        <p>Try adjusting your search or filter criteria.</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if books.has_other_pages %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if books.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ books.previous_page_number }}{% for genre_id in request.GET.genre %}&genre={{ genre_id }}{% endfor %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&laquo;</span>
+                    </li>
+                    {% endif %}
+
+                    {% for num in books.paginator.page_range %}
+                        {% if books.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > books.number|add:'-3' and num < books.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% for genre_id in request.GET.genre %}&genre={{ genre_id }}{% endfor %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if books.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ books.next_page_number }}{% for genre_id in request.GET.genre %}&genre={{ genre_id }}{% endfor %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&raquo;</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .book-cover {
+        height: 280px;
+        object-fit: cover;
+        transition: all 0.3s;
+    }
+    
+    .book-card {
+        transition: all 0.3s ease;
+    }
+    
+    .book-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .book-cover-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .book-hover-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        opacity: 0;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .book-card:hover .book-hover-overlay {
+        opacity: 1;
+    }
+    
+    .ratings {
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+        
+        // Mobile filter toggle functionality
+        const filterToggle = document.getElementById('filterToggle');
+        if (filterToggle) {
+            filterToggle.addEventListener('click', function() {
+                const filterPanel = document.getElementById('filterPanel');
+                if (filterPanel) {
+                    filterPanel.classList.toggle('d-none');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

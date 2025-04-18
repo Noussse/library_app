@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -7,9 +7,14 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 import requests
 import random
-
+from django.db.models import Count, Q
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from .models import Book, Author, Genre
 from .forms import UserUpdateForm
 from .utils import check_password_strength
+from django.db import models
+
+
 
 User = get_user_model()  # Custom user model
 verification_codes = {}
@@ -96,10 +101,6 @@ def user_logout(request):
     messages.success(request, "You have been logged out successfully!")
     return redirect('login')
 
-# Home View
-def home(request):
-    return render(request, 'home.html')
-
 # Profile View
 @login_required
 def profile_view(request):
@@ -127,14 +128,12 @@ def edit_profile(request):
             new_password = form.cleaned_data.get('password')
 
             if new_password:
-                print(f"Old password: {user.password}")  # Print old password (hashed)
                 user.set_password(new_password)
-                print(f"New password: {user.password}")  # Print new password (hashed)
 
             user.save()
 
             if new_password:
-                login(request,user)
+                login(request, user)
 
             messages.success(request, "Profile updated successfully.")
             return redirect('profile')
@@ -195,24 +194,179 @@ def reset_password(request):
     if request.method == 'POST':
         password1 = request.POST['password1']
         password2 = request.POST['password2']
-        print("📌 Password 1:", password1)
-        print("📌 Password 2:", password2)
 
         if password1 != password2:
             messages.error(request, "Passwords don't match.")
         else:
             try:
                 user = User.objects.get(phone=phone)
-                print("✅ User found:", user.username)
-
                 user.set_password(password1)
                 user.save()
-                print("✅ Password reset and saved!")
-
                 messages.success(request, "Password reset successfully.")
                 return redirect('login')
             except User.DoesNotExist:
                 messages.error(request, "No user found with that phone.")
-                print("❌ No user found with phone:", phone)
 
     return render(request, 'reset_password.html')
+
+# Home View
+def home(request):
+    """
+    View function for the home page of the library site.
+    """
+    # Get featured books (you can customize this logic)
+    featured_books = Book.objects.all().order_by('?')[:10]  # Random 4 books
+    
+    # Get recently added books
+    recent_books = Book.objects.all().order_by('-created_at')[:7]
+    
+    # Get popular genres with book count
+    genres = Genre.objects.annotate(book_count=Count('books')).order_by('-book_count')[:4]
+    
+    # Get popular authors with book count
+    popular_authors = Author.objects.annotate(book_count=Count('books')).order_by('-book_count')[:4]
+    
+    context = {
+        'featured_books': featured_books,
+        'recent_books': recent_books,
+        'popular_genres': genres,
+        'popular_authors': popular_authors,
+    }
+    
+    return render(request, 'home.html', context)
+
+# Book Detail View
+def book_detail(request, book_id):
+    """
+    View function for the book detail page.
+    """
+    book = get_object_or_404(Book, pk=book_id)
+    context = {
+        'book': book,
+    }
+    return render(request, 'book_detail.html', context)
+
+# Author Books View
+def author_books(request, author_id):
+    """
+    View function to display all books by an author.
+    """
+    author = get_object_or_404(Author, pk=author_id)
+    books = author.books.all()
+    context = {
+        'author': author,
+        'books': books,
+    }
+    return render(request, 'author_books.html', context)
+
+# Genre Books View
+def genre_books(request, genre_id):
+    """
+    View function to display all books in a genre.
+    """
+    genre = get_object_or_404(Genre, pk=genre_id)
+    books = genre.books.all()
+    context = {
+        'genre': genre,
+        'books': books,
+    }
+    return render(request, 'genre_books.html', context)
+
+# Search Books View
+def search_books(request):
+    """
+    View function to search for books by title, author, or genre.
+    """
+    query = request.GET.get('q', '')
+    
+    if query:
+        # Search in titles
+        title_results = Book.objects.filter(title__icontains=query)
+        
+        # Search in authors
+        author_results = Book.objects.filter(authors__name__icontains=query)
+        
+        # Search in genres
+        genre_results = Book.objects.filter(genres__name__icontains=query)
+        
+        # Combine results and remove duplicates
+        results = title_results.union(author_results, genre_results)
+    else:
+        results = Book.objects.none()
+    
+    context = {
+        'query': query,
+        'results': results,
+    }
+    
+    return render(request, 'search_results.html', context)
+
+
+def browse_books(request):
+    """
+    View function to browse all books with filtering, sorting, and pagination.
+    """
+    # Get all books, potentially with prefetch_related for authors
+    queryset = Book.objects.all().prefetch_related('authors')
+    
+    # Handle search
+    search_query = request.GET.get('search', '')
+    if search_query:
+        queryset = queryset.filter(
+            Q(title__icontains=search_query) | 
+            Q(authors__name__icontains=search_query)
+        ).distinct()
+    
+    # Handle genre filtering
+    genre_ids = request.GET.getlist('genre')
+    if genre_ids:
+        queryset = queryset.filter(genres__id__in=genre_ids).distinct()
+    
+    
+    # Get all genres for the filter sidebar with count annotation
+    all_genres = Genre.objects.annotate(book_count=Count('books'))
+    
+    # Convert genre_ids to integers for easier comparison in template
+    selected_genres = [int(g_id) for g_id in genre_ids if g_id.isdigit()]
+    
+    # Set up pagination
+    paginator = Paginator(queryset, 12)  # 12 books per page
+    page = request.GET.get('page', 1)
+    
+    try:
+        books = paginator.page(page)
+    except PageNotAnInteger:
+        books = paginator.page(1)
+    except EmptyPage:
+        books = paginator.page(paginator.num_pages)
+    
+    context = {
+        'books': books,
+        'all_genres': all_genres,
+        'selected_genres': selected_genres,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'browse_books.html', context)
+
+# Browse Authors View
+def browse_authors(request):
+    """
+    View function to browse all authors.
+    """
+    authors = Author.objects.all().order_by('name')
+    context = {
+        'authors': authors,
+    }
+    return render(request, 'browse_authors.html', context)
+
+# Browse Genres View (added to match URL pattern)
+def browse_genres(request):
+    """
+    View function to browse all genres.
+    """
+    genres = Genre.objects.annotate(book_count=Count('books')).order_by('name')
+    context = {
+        'genres': genres,
+    }
+    return render(request, 'browse_genres.html', context)
