@@ -81,12 +81,8 @@ WSGI_APPLICATION = 'OnlineBookStore.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'bookstore',         # 👉 your DB name
-        'USER': 'postgres',           # 👉 your DB user (usually 'postgres')
-        'PASSWORD': '0000',  # 👉 your DB password
-        'HOST': 'localhost',
-        'PORT': '5000',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'BookStore.sqlite3',  # This will create the database file in your project root
     }
 }
 
