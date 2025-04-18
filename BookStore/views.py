@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -7,9 +7,14 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 import requests
 import random
-
+from django.db.models import Count, Q
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from .models import Book, Author, Genre
 from .forms import UserUpdateForm
 from .utils import check_password_strength
+from django.db import models
+
+
 
 User = get_user_model()  # Custom user model
 verification_codes = {}
@@ -96,10 +101,6 @@ def user_logout(request):
     messages.success(request, "You have been logged out successfully!")
     return redirect('login')
 
-# Home View
-def home(request):
-    return render(request, 'home.html')
-
 # Profile View
 @login_required
 def profile_view(request):
@@ -127,14 +128,12 @@ def edit_profile(request):
             new_password = form.cleaned_data.get('password')
 
             if new_password:
-                print(f"Old password: {user.password}")  # Print old password (hashed)
                 user.set_password(new_password)
-                print(f"New password: {user.password}")  # Print new password (hashed)
 
             user.save()
 
             if new_password:
-                login(request,user)
+                login(request, user)
 
             messages.success(request, "Profile updated successfully.")
             return redirect('profile')
@@ -195,24 +194,119 @@ def reset_password(request):
     if request.method == 'POST':
         password1 = request.POST['password1']
         password2 = request.POST['password2']
-        print("📌 Password 1:", password1)
-        print("📌 Password 2:", password2)
 
         if password1 != password2:
             messages.error(request, "Passwords don't match.")
         else:
             try:
                 user = User.objects.get(phone=phone)
-                print("✅ User found:", user.username)
-
                 user.set_password(password1)
                 user.save()
-                print("✅ Password reset and saved!")
-
                 messages.success(request, "Password reset successfully.")
                 return redirect('login')
             except User.DoesNotExist:
                 messages.error(request, "No user found with that phone.")
-                print("❌ No user found with phone:", phone)
 
     return render(request, 'reset_password.html')
+
+# Home View
+def home(request):
+    """
+    View function for the home page of the library site.
+    """
+    # Get featured books (you can customize this logic)
+    featured_books = Book.objects.all().order_by('?')[:10]  # Random 4 books
+    
+    # Get recently added books
+    recent_books = Book.objects.all().order_by('-created_at')[:7]
+    
+    # Get popular genres with book count
+    genres = Genre.objects.annotate(book_count=Count('books')).order_by('-book_count')[:4]
+    
+    # Get popular authors with book count
+    popular_authors = Author.objects.annotate(book_count=Count('books')).order_by('-book_count')[:4]
+    
+    context = {
+        'featured_books': featured_books,
+        'recent_books': recent_books,
+        'popular_genres': genres,
+        'popular_authors': popular_authors,
+    }
+    
+    return render(request, 'home.html', context)
+
+# Book Detail View
+def book_detail(request, book_id):
+    """
+    View function to display details of a specific book.
+    """
+    # Get the book or return 404 if not found
+    book = get_object_or_404(Book, id=book_id)
+    
+    # Get related books (same genre or author)
+    related_books = Book.objects.filter(
+        Q(genres__in=book.genres.all()) | 
+        Q(authors__in=book.authors.all())
+    ).exclude(id=book.id).distinct()[:4]  # Limit to 4 related books
+    
+    context = {
+        'book': book,
+        'related_books': related_books,
+    }
+    
+    return render(request, 'book_detail.html', context)
+
+
+def browse_books(request):
+    """
+    View function to browse all books with filtering, sorting, and pagination.
+    """
+    queryset = Book.objects.all().prefetch_related('authors')
+   
+    # Handle search
+    search_query = request.GET.get('search', '')
+    if search_query:
+        queryset = queryset.filter(
+            Q(title__icontains=search_query) |
+            Q(authors__name__icontains=search_query)
+        ).distinct()
+   
+    # Handle genre filtering
+    genre_ids = request.GET.getlist('genre')
+    if genre_ids:
+        queryset = queryset.filter(genres__id__in=genre_ids).distinct()
+        
+    # Handle sorting
+    sort_by = request.GET.get('sort', 'recent')
+    if sort_by == 'title':
+        queryset = queryset.order_by('title')
+    elif sort_by == 'recent':
+        # Use published_year for sorting by most recent
+        queryset = queryset.order_by('-published_year')
+    # Note: We're removing 'rating' and 'popular' options as they're not implemented
+   
+    # Get all genres for the filter sidebar with count annotation
+    all_genres = Genre.objects.annotate(book_count=Count('books'))
+   
+    # Convert genre_ids to integers for easier comparison in template
+    selected_genres = [int(g_id) for g_id in genre_ids if g_id.isdigit()]
+   
+    # Set up pagination
+    paginator = Paginator(queryset, 12)  # 12 books per page
+    page = request.GET.get('page', 1)
+   
+    try:
+        books = paginator.page(page)
+    except PageNotAnInteger:
+        books = paginator.page(1)
+    except EmptyPage:
+        books = paginator.page(paginator.num_pages)
+   
+    context = {
+        'books': books,
+        'all_genres': all_genres,
+        'selected_genres': selected_genres,
+        'search_query': search_query,
+    }
+   
+    return render(request, 'browse_books.html', context)

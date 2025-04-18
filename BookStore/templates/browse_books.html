@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Browse Books - BookHub Library{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-lg-8">
+            <h1 class="display-4 fw-bold mb-3">Explore Our Collection</h1>
+            <p class="lead text-muted">Discover thousands of books across genres, from timeless classics to contemporary bestsellers.</p>
+        </div>
+        <div class="col-lg-4">
+            <form action="{% url 'browse_books' %}" method="get" class="mb-4" id="searchForm">
+                <div class="input-group input-group-lg shadow-sm">
+                    <input type="text" name="search" class="form-control" placeholder="Search books or authors..." value="{{ request.GET.search|default:'' }}">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <!-- Hidden inputs to preserve all genre filters -->
+                {% for genre_id in selected_genres %}
+                    <input type="hidden" name="genre" value="{{ genre_id }}">
+                {% endfor %}
+                <!-- Preserve sort parameter -->
+                {% if request.GET.sort %}
+                    <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content Row -->
+    <div class="row">
+        <!-- Sidebar Filters -->
+        <div class="col-md-4 col-lg-3">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Filter by Genre</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{% url 'browse_books' %}" method="get" id="genreFilterForm">
+                        <!-- Preserve search query -->
+                        {% if search_query %}
+                            <input type="hidden" name="search" value="{{ search_query }}">
+                        {% endif %}
+                        
+                        <!-- Preserve sort parameter -->
+                        {% if request.GET.sort %}
+                            <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+                        {% endif %}
+        
+                        <div class="mb-3">
+                            {% for genre in all_genres %}
+                                <div class="form-check py-1">
+                                    <input class="form-check-input" type="checkbox" name="genre" value="{{ genre.id }}" id="genre{{ genre.id }}"
+                                        {% if genre.id in selected_genres %}checked{% endif %}>
+                                    <label class="form-check-label d-flex justify-content-between" for="genre{{ genre.id }}">
+                                        {{ genre.name }}
+                                        <span class="badge bg-light text-dark">{{ genre.book_count }}</span>
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+        
+                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                        <div class="text-center mt-2">
+                            <a href="{% url 'browse_books' %}" class="btn btn-link btn-sm">Clear all filters</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Reading Lists Promo -->
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">Create Reading Lists</h5>
+                    <p class="card-text">Organize your favorite books and track your reading journey.</p>
+                    <a href="#" class="btn btn-sm btn-outline-primary">Learn More</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Books Grid -->
+        <div class="col-md-8 col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="m-0">Browse Books</h4>
+                    <p class="text-muted mb-0">
+                        Showing {{ books.start_index }} to {{ books.end_index }} of {{ books.paginator.count }} books
+                    </p>
+                </div>
+                
+                <!-- Sort Options - Only showing implemented options -->
+                <div>
+                    <form class="d-inline-flex" method="get" action="{% url 'browse_books' %}" id="sortForm">
+                        <!-- Preserve search parameter -->
+                        {% if search_query %}
+                            <input type="hidden" name="search" value="{{ search_query }}">
+                        {% endif %}
+                        
+                        <!-- Preserve all genre parameters -->
+                        {% for genre_id in selected_genres %}
+                            <input type="hidden" name="genre" value="{{ genre_id }}">
+                        {% endfor %}
+                        
+                        <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="recent" {% if request.GET.sort == 'recent' %}selected{% endif %}>Most Recent</option>
+                            <option value="title" {% if request.GET.sort == 'title' %}selected{% endif %}>Title (A-Z)</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Active Filters Display -->
+            <div class="mb-4">
+                {% if search_query or selected_genres %}
+                <div class="alert alert-info">
+                    <div class="d-flex flex-wrap align-items-center">
+                        <div>
+                            {% if search_query %}
+                                <span class="me-3 mb-2 d-inline-block">
+                                    <strong>Search:</strong> "{{ search_query }}"
+                                    <a href="?{% for genre_id in selected_genres %}&genre={{ genre_id }}{% endfor %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="text-decoration-none ms-2">
+                                        <i class="fas fa-times-circle"></i>
+                                    </a>
+                                </span>
+                            {% endif %}
+                            
+                            {% if selected_genres %}
+                                <strong class="me-2">Genres:</strong>
+                                {% for genre_id in selected_genres %}
+                                    {% for genre in all_genres %}
+                                        {% if genre.id == genre_id %}
+                                            <span class="badge bg-primary me-1 mb-1">
+                                                {{ genre.name }}
+                                                <a href="?{% if search_query %}search={{ search_query }}{% endif %}{% for g_id in selected_genres %}{% if g_id != genre_id %}&genre={{ g_id }}{% endif %}{% endfor %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="text-white text-decoration-none ms-1">
+                                                    <i class="fas fa-times"></i>
+                                                </a>
+                                            </span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="ms-auto mt-2">
+                            <a href="{% url 'browse_books' %}" class="btn btn-sm btn-outline-dark">Clear all</a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3 mb-4">
+                {% for book in books %}
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm book-card">
+                        <a href="{% url 'book_detail' book.id %}" class="text-decoration-none">
+                            <div class="position-relative book-cover-wrapper">
+                                {% if book.cover_image %}
+                                <img src="{{ book.cover_image.url }}" class="card-img-top book-cover" alt="{{ book.title }}">
+                                {% elif book.cover_url %}
+                                <img src="{{ book.cover_url }}" class="card-img-top book-cover" alt="{{ book.title }}">
+                                {% else %}
+                                <img src="{% static 'library/images/default-cover.jpg' %}" class="card-img-top book-cover" alt="{{ book.title }}">
+                                {% endif %}
+                                <div class="book-hover-overlay">
+                                    <div class="d-flex justify-content-center align-items-center h-100">
+                                        <span class="btn btn-sm btn-primary">View Details</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title mb-1">
+                                <a href="{% url 'book_detail' book.id %}" class="text-decoration-none text-dark">{{ book.title }}</a>
+                            </h5>
+                            <p class="card-text mb-1">
+                                {% for author in book.authors.all %}
+                                <a href="#" class="text-decoration-none text-muted">{{ author.name }}</a>{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                            {% if book.published_year %}
+                            <p class="card-text small text-muted">{{ book.published_year }}</p>
+                            {% endif %}
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <div class="ratings">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star-half-alt text-warning"></i>
+                                    <span class="small text-muted">(4.5)</span>
+                                </div>
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="far fa-bookmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center py-5">
+                        <i class="fas fa-book-open fa-3x mb-3"></i>
+                        <h4>No books found</h4>
+                        <p>Try adjusting your search or filter criteria.</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if books.has_other_pages %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if books.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ books.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% for genre_id in selected_genres %}&genre={{ genre_id }}{% endfor %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&laquo;</span>
+                    </li>
+                    {% endif %}
+
+                    {% for num in books.paginator.page_range %}
+                        {% if books.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > books.number|add:'-3' and num < books.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% for genre_id in selected_genres %}&genre={{ genre_id }}{% endfor %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if books.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ books.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% for genre_id in selected_genres %}&genre={{ genre_id }}{% endfor %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&raquo;</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .book-cover {
+        height: 280px;
+        object-fit: cover;
+        transition: all 0.3s;
+    }
+    
+    .book-card {
+        transition: all 0.3s ease;
+    }
+    
+    .book-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .book-cover-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .book-hover-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        opacity: 0;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .book-card:hover .book-hover-overlay {
+        opacity: 1;
+    }
+    
+    .ratings {
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+        
+        // Mobile filter toggle functionality
+        const filterToggle = document.getElementById('filterToggle');
+        if (filterToggle) {
+            filterToggle.addEventListener('click', function() {
+                const filterPanel = document.getElementById('filterPanel');
+                if (filterPanel) {
+                    filterPanel.classList.toggle('d-none');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

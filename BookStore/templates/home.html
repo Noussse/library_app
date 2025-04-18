@@ -1,84 +1,155 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home</title>
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      background-color: #F4F7FA;
-      font-family: 'Segoe UI', sans-serif;
-      padding-top: 50px;
-    }
-    
-    .home-container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 30px;
-      background-color: white;
-      border-radius: 12px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-    
-    .welcome-title {
-      color: #4A90E2;
-      font-size: 2.5rem;
-      margin-bottom: 30px;
-    }
-    
-    .action-buttons {
-      margin: 30px 0;
-    }
-    
-    .btn-primary {
-      background-color: #50E3C2;
-      border-color: #50E3C2;
-      padding: 10px 30px;
-      font-size: 1.1rem;
-      margin-right: 15px;
-    }
-    
-    .btn-primary:hover {
-      background-color: #45d3b1;
-    }
-    
-    .btn-danger {
-      background-color: #E94E77;
-      border-color: #E94E77;
-      padding: 10px 30px;
-      font-size: 1.1rem;
-    }
-    
-    .btn-danger:hover {
-      background-color: #d6456c;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="home-container">
-      <h1 class="welcome-title">Welcome, {{ user.username }}!</h1>
-      
-      <p class="lead">We're glad to see you back. Explore your account or check out new features.</p>
-      
-      <div class="action-buttons">
-        <a href="{% url 'profile' %}" class="btn btn-primary btn-lg">View Profile</a>
-        
-        
-      </div>
-      
-      <form action="{% url 'logout' %}" method="POST">
-        {% csrf_token %}
-        <button name="logout" type="submit" class="btn btn-danger">Logout</button>
-      </form>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}BookHub Library - Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h1 class="display-5 fw-bold mb-3">Discover Your Next Great Read</h1>
+                <p class="lead mb-4">Explore our vast collection of books, authors, and genres all in one place.</p>
+                <form action="{% url 'browse_books' %}" method="get">
+                    <div class="input-group mb-3">
+                        <input type="text" name="search" class="form-control search-box" placeholder="Search for books ...">
+                        <button class="btn btn-primary search-button" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
-  
-  <!-- Bootstrap Scripts -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.5/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+</section>
+
+<!-- Featured Books Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Featured Books</h2>
+            <a href="{% url 'browse_books' %}" class="section-link btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        
+        <div class="position-relative">
+            <div class="books-container" id="featured-books">
+                {% for book in featured_books %}
+                <div class="book-item">
+                    {% if book.cover_image %}
+                    <a href="{% url 'book_detail' book.id %}"><img src="{{ book.cover_image.url }}" class="book-cover w-100" alt="{{ book.title }}"></a>
+                    {% endif %}
+                    <h5 class="book-title">{{ book.title }}</h5>
+                    <p class="book-author">
+                        {% for author in book.authors.all|slice:":1" %}
+                            {{ author.name }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                        {% if book.authors.count > 1 %}
+                            et al.
+                        {% endif %}
+                    </p>
+                </div>
+                {% empty %}
+                <div class="col text-center py-5">
+                    <p>No featured books available yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            {% if featured_books|length > 4 %}
+            <div class="scroll-arrows">
+                <div class="scroll-arrow scroll-left" onclick="scrollBooks('featured-books', -300)">
+                    <i class="fas fa-chevron-left"></i>
+                </div>
+                <div class="scroll-arrow scroll-right" onclick="scrollBooks('featured-books', 300)">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Popular Genres Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="section-title mb-4">Browse by Genre</h2>
+        <div class="row g-4">
+            {% for genre in popular_genres %}
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="{% url 'browse_books' %}?genre={{ genre.id }}" class="text-decoration-none">
+                    <div class="card genre-card text-center h-100 py-4">
+                        <div class="card-body">
+                            <i class="fas {{ genre.icon }} genre-icon text-{{ genre.color }}"></i>
+                            <h5 class="card-title">{{ genre.name }}</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <div class="col text-center py-4">
+                <p>No genres available yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Recent Additions Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Recently Added</h2>
+            <a href="{% url 'browse_books' %}?sort=newest" class="section-link btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        
+        <div class="position-relative">
+            <div class="books-container" id="recent-books">
+                {% for book in recent_books %}
+                <div class="book-item">
+                    {% if book.cover_image %}
+                    <a href="{% url 'book_detail' book.id %}"><img src="{{ book.cover_image.url }}" class="book-cover w-100" alt="{{ book.title }}"> </a>
+                    {% endif %}
+                    <h5 class="book-title">{{ book.title }}</h5>
+                    <p class="book-author">
+                        {% for author in book.authors.all|slice:":1" %}
+                            {{ author.name }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                        {% if book.authors.count > 1 %}
+                            et al.
+                        {% endif %}
+                    </p>
+                </div>
+                {% empty %}
+                <div class="col text-center py-5">
+                    <p>No recent books available yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            {% if recent_books|length > 4 %}
+            <div class="scroll-arrows">
+                <div class="scroll-arrow scroll-left" onclick="scrollBooks('recent-books', -300)">
+                    <i class="fas fa-chevron-left"></i>
+                </div>
+                <div class="scroll-arrow scroll-right" onclick="scrollBooks('recent-books', 300)">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="py-5 bg-primary text-white text-center">
+    <div class="container">
+        <h2 class="mb-4">Join Our Library Community</h2>
+        <p class="lead mb-4">Sign up today to track your reading progress, create reading lists, and get personalized recommendations!</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'register' %}" class="btn btn-light btn-lg">Sign Up</a>
+            <a href="#" class="btn btn-outline-light btn-lg">Learn More</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
