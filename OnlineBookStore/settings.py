@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'OnlineBookStore.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'bookstore.sqlite3',
+        'NAME': BASE_DIR / 'BookStore.sqlite3',  # This will create the database file in your project root
     }
 }
 
