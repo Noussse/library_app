@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Search Results - BookHub Library{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Search Hero Section -->
+    <div class="row mb-5">
+        <div class="col-lg-8">
+            <h1 class="display-4 fw-bold mb-3">Search Results</h1>
+            <p class="lead text-muted">Find your next great read in our extensive collection.</p>
+        </div>
+        <div class="col-lg-4">
+            <form action="{% url 'search_books' %}" method="get" class="mb-4">
+                <div class="input-group input-group-lg shadow-sm">
+                    <input type="text" name="q" class="form-control" placeholder="Search books or authors..." value="{{ query }}">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Sidebar -->
+        <div class="col-md-4 col-lg-3">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Search Filters</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{% url 'search_books' %}" method="get">
+                        {% if query %}
+                        <input type="hidden" name="q" value="{{ query }}">
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Content Type</label>
+                            <div class="form-check py-1">
+                                <input class="form-check-input" type="checkbox" name="type" value="book" id="typeBook" checked>
+                                <label class="form-check-label d-flex justify-content-between" for="typeBook">
+                                    Books
+                                </label>
+                            </div>
+                            <div class="form-check py-1">
+                                <input class="form-check-input" type="checkbox" name="type" value="author" id="typeAuthor" checked>
+                                <label class="form-check-label d-flex justify-content-between" for="typeAuthor">
+                                    Authors
+                                </label>
+                            </div>
+                            <div class="form-check py-1">
+                                <input class="form-check-input" type="checkbox" name="type" value="genre" id="typeGenre" checked>
+                                <label class="form-check-label d-flex justify-content-between" for="typeGenre">
+                                    Genres
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Availability</label>
+                            <div class="form-check py-1">
+                                <input class="form-check-input" type="checkbox" name="available" value="yes" id="availableYes">
+                                <label class="form-check-label d-flex justify-content-between" for="availableYes">
+                                    Currently Available
+                                </label>
+                            </div>
+                            <div class="form-check py-1">
+                                <input class="form-check-input" type="checkbox" name="ebook" value="yes" id="ebookYes">
+                                <label class="form-check-label d-flex justify-content-between" for="ebookYes">
+                                    E-book Available
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Publication Year</label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <input type="number" class="form-control form-control-sm" name="year_from" placeholder="From">
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" class="form-control form-control-sm" name="year_to" placeholder="To">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                        <div class="text-center mt-2">
+                            <a href="{% url 'search_books' %}{% if query %}?q={{ query }}{% endif %}" class="btn btn-link btn-sm">Clear filters</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Recently Viewed -->
+            <div class="card border-0 shadow-sm bg-light mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Recently Viewed</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2 text-truncate">
+                            <a href="#" class="text-decoration-none">
+                                <i class="fas fa-book-open me-2 text-muted"></i>
+                                The Great Gatsby
+                            </a>
+                        </li>
+                        <li class="mb-2 text-truncate">
+                            <a href="#" class="text-decoration-none">
+                                <i class="fas fa-book-open me-2 text-muted"></i>
+                                To Kill a Mockingbird
+                            </a>
+                        </li>
+                        <li class="text-truncate">
+                            <a href="#" class="text-decoration-none">
+                                <i class="fas fa-book-open me-2 text-muted"></i>
+                                1984
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Results Grid -->
+        <div class="col-md-8 col-lg-9">
+            {% if query %}
+            <div class="alert alert-light mb-4 shadow-sm">
+                <div class="d-flex align-items-center">
+                    <div>
+                        <strong>Search results for:</strong> "{{ query }}"
+                        <p class="text-muted mb-0">Found {{ results|length }} results</p>
+                    </div>
+                    <div class="ms-auto">
+                        <a href="{% url 'browse_books' %}" class="btn btn-sm btn-outline-primary">Browse All Books</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if results %}
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3 mb-4">
+                {% for book in results %}
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm book-card">
+                        <a href="{% url 'book_detail' book.id %}" class="text-decoration-none">
+                            <div class="position-relative book-cover-wrapper">
+                                {% if book.cover_image %}
+                                <img src="{{ book.cover_image.url }}" class="card-img-top book-cover" alt="{{ book.title }}">
+                                {% elif book.cover_url %}
+                                <img src="{{ book.cover_url }}" class="card-img-top book-cover" alt="{{ book.title }}">
+                                {% else %}
+                                <img src="{% static 'library/images/default-cover.jpg' %}" class="card-img-top book-cover" alt="{{ book.title }}">
+                                {% endif %}
+                                <div class="book-hover-overlay">
+                                    <div class="d-flex justify-content-center align-items-center h-100">
+                                        <span class="btn btn-sm btn-primary">View Details</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title mb-1">
+                                <a href="{% url 'book_detail' book.id %}" class="text-decoration-none text-dark">{{ book.title }}</a>
+                            </h5>
+                            <p class="card-text mb-1">
+                                {% for author in book.authors.all %}
+                                <a href="#" class="text-decoration-none text-muted">{{ author.name }}</a>{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                            {% if book.published_year %}
+                            <p class="card-text small text-muted">{{ book.published_year }}</p>
+                            {% endif %}
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <div class="ratings">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star-half-alt text-warning"></i>
+                                    <span class="small text-muted">(4.5)</span>
+                                </div>
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="far fa-bookmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+                {% if query %}
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x mb-3 text-muted"></i>
+                    <h3>No results found for "{{ query }}"</h3>
+                    <p class="text-muted">Try using different keywords or browse our collection below.</p>
+                    <div class="mt-4">
+                        <a href="{% url 'browse_books' %}" class="btn btn-primary">Browse All Books</a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x mb-3 text-muted"></i>
+                    <h3>Start your search</h3>
+                    <p class="text-muted">Enter a book title, author name, or genre to find what you're looking for.</p>
+                </div>
+                {% endif %}
+            {% endif %}
+
+            {% if results.has_other_pages %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if results.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ query }}&page={{ results.previous_page_number }}{% for type in request.GET.getlist %}&type={{ type }}{% endfor %}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&laquo;</span>
+                    </li>
+                    {% endif %}
+
+                    {% for num in results.paginator.page_range %}
+                        {% if results.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > results.number|add:'-3' and num < results.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?q={{ query }}&page={{ num }}{% for type in request.GET.getlist %}&type={{ type }}{% endfor %}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if results.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ query }}&page={{ results.next_page_number }}{% for type in request.GET.getlist %}&type={{ type }}{% endfor %}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&raquo;</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .book-cover {
+        height: 280px;
+        object-fit: cover;
+        transition: all 0.3s;
+    }
+    
+    .book-card {
+        transition: all 0.3s ease;
+    }
+    
+    .book-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+    }
+    
+    .book-cover-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .book-hover-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        opacity: 0;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .book-card:hover .book-hover-overlay {
+        opacity: 1;
+    }
+    
+    .ratings {
+        font-size: 0.8rem;
+    }
+    
+    /* Additional search-specific styles */
+    .highlight {
+        background-color: rgba(255, 236, 0, 0.25);
+        padding: 0 2px;
+    }
+    
+    .search-count {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+        
+        // Highlight search terms
+        if ("{{ query }}") {
+            const searchTerms = "{{ query }}".toLowerCase().split(' ');
+            const contentNodes = document.querySelectorAll('.card-title, .card-text');
+            
+            contentNodes.forEach(node => {
+                const content = node.innerHTML;
+                let highlightedContent = content;
+                
+                searchTerms.forEach(term => {
+                    if (term.length > 2) { // Only highlight terms longer than 2 characters
+                        const regex = new RegExp(`(${term})`, 'gi');
+                        highlightedContent = highlightedContent.replace(regex, '<span class="highlight">$1</span>');
+                    }
+                });
+                
+                if (content !== highlightedContent) {
+                    node.innerHTML = highlightedContent;
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

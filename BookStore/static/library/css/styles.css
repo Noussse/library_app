@@ -1,0 +1,46 @@
+/* Custom styles for BookHub Library */
+
+/* Book cards */
+.book-card {
+    transition: transform 0.3s;
+    height: 100%;
+}
+.book-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+
+}
+.book-cover {
+    height: 300px;
+    object-fit: cover;
+}
+
+/* Hero section */
+.hero-section {
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../images/library-bg.jpg');
+    background-size: cover;
+    color: white;
+    padding: 100px 0;
+}
+
+/* Genre badges */
+.genre-badge {
+    font-size: 0.8rem;
+}
+
+/* Search box */
+.search-box {
+    border-radius: 30px;
+    padding-left: 20px;
+}
+
+/* Navigation */
+.nav-link {
+    font-weight: 500;
+}
+
+/* Footer */
+.footer {
+    background-color: #343a40;
+    color: white;
+}
