@@ -5,55 +5,125 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <style>
     body {
-      background-color: #F4F7FA;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       height: 100vh;
       margin: 0;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
     }
 
     .login-card {
       width: 100%;
-      max-width: 380px;
-      border-radius: 12px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      max-width: 400px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
       background-color: white;
-      padding: 25px;
+      padding: 35px;
+      transition: transform 0.3s ease;
+    }
+    
+    .login-card:hover {
+      transform: translateY(-5px);
     }
 
     .login-title {
-      color: #4A90E2;
-      font-size: 2rem;
+      color: #3a86ff;
+      font-size: 2.2rem;
+      font-weight: 700;
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
+    }
+
+    .form-group label {
+      font-weight: 500;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    .form-control {
+      border-radius: 8px;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+
+    .form-control:focus {
+      border-color: #3a86ff;
+      box-shadow: 0 0 0 0.2rem rgba(58, 134, 255, 0.25);
     }
 
     .btn-primary {
-      background-color: #50E3C2;
-      border-color: #50E3C2;
+      background: linear-gradient(135deg, #3a86ff 0%, #0066ff 100%);
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
     }
 
     .btn-primary:hover {
-      background-color: #45d3b1;
+      background: linear-gradient(135deg, #0066ff 0%, #0053cc 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 102, 255, 0.3);
     }
 
     .btn-secondary {
-      background-color: #4A90E2;
-      border-color: #4A90E2;
+      background: linear-gradient(135deg, #8ecae6 0%, #219ebc 100%);
+      border: none;
+      border-radius: 30px;
+      padding: 8px 18px;
+      font-weight: 500;
+      transition: all 0.3s ease;
     }
 
     .btn-secondary:hover {
-      background-color: #417fc2;
+      background: linear-gradient(135deg, #219ebc 0%, #1a7a94 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(33, 158, 188, 0.3);
     }
     
     .forgot-password {
       text-align: right;
-      margin-top: 5px;
-      margin-bottom: 15px;
+      margin-top: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .forgot-password a {
+      color: #3a86ff;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    
+    .forgot-password a:hover {
+      color: #0053cc;
+      text-decoration: none;
+    }
+    
+    .alert {
+      border-radius: 8px;
+    }
+    
+    .input-icon {
+      position: relative;
+    }
+    
+    .input-icon i {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      transform: translateY(-50%);
+      color: #aaa;
+    }
+    
+    .input-icon input {
+      padding-left: 40px;
     }
   </style>
 </head>
@@ -64,7 +134,7 @@
 
     {% if messages %}
       <div class="alert alert-danger">
-        <ul>
+        <ul class="mb-0">
           {% for message in messages %}
             <li>{{ message }}</li>
           {% endfor %}
@@ -77,21 +147,31 @@
 
       <div class="form-group">
         <label for="username">Username</label>
-        <input type="text" name="username" class="form-control" id="username" placeholder="Enter your username" required>
+        <div class="input-icon">
+          <i class="fas fa-user"></i>
+          <input type="text" name="username" class="form-control" id="username" placeholder="Enter your username" required>
+        </div>
       </div>
 
       <div class="form-group">
         <label for="password">Password</label>
-        <input type="password" name="password" class="form-control" id="password" placeholder="Enter your password" required>
+        <div class="input-icon">
+          <i class="fas fa-lock"></i>
+          <input type="password" name="password" class="form-control" id="password" placeholder="Enter your password" required>
+        </div>
         <div class="forgot-password">
-          <a href="{% url 'forget_password' %}" class="text-primary">Forgot Password?</a>
+          <a href="{% url 'forget_password' %}">Forgot Password?</a>
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary btn-block">Login</button>
+      <button type="submit" class="btn btn-primary btn-block">
+        <i class="fas fa-sign-in-alt mr-2"></i>Login
+      </button>
 
-      <div class="text-center mt-3">
-        <a href="{% url 'register' %}" class="btn btn-secondary btn-sm">Create an Account</a>
+      <div class="text-center mt-4">
+        <a href="{% url 'register' %}" class="btn btn-secondary">
+          <i class="fas fa-user-plus mr-2"></i>Create an Account
+        </a>
       </div>
     </form>
   </div>

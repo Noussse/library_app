@@ -15,7 +15,6 @@ urlpatterns = [
     path('reset-password/', views.reset_password, name='reset_password'),
 
 
-
     path('', views.home, name='home'),
     
     # Book detail

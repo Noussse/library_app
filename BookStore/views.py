@@ -13,7 +13,7 @@ from .models import Book, Author, Genre
 from .forms import UserUpdateForm
 from .utils import check_password_strength
 from django.db import models
-
+from BookStore.models import CustomUser  # Replace 'your_app' with your actual app name
 
 
 User = get_user_model()  # Custom user model
@@ -127,13 +127,14 @@ def edit_profile(request):
             user = form.save(commit=False)
             new_password = form.cleaned_data.get('password')
 
-            if new_password:
+            if new_password and new_password.strip() != '':
                 user.set_password(new_password)
-
-            user.save()
-
-            if new_password:
-                login(request, user)
+                user.save()
+                login(request, user)  # log in again after password change
+            else:
+                # Don't touch password if empty
+                user.password = CustomUser.objects.get(pk=user.pk).password
+                user.save()
 
             messages.success(request, "Profile updated successfully.")
             return redirect('profile')
@@ -187,10 +188,6 @@ def send_whatsapp_message(phone, message):
 # Reset Password View
 def reset_password(request):
     phone = request.session.get('reset_phone')
-    if not phone:
-        messages.error(request, "Session expired. Try again.")
-        return redirect('forget_password')
-
     if request.method == 'POST':
         password1 = request.POST['password1']
         password2 = request.POST['password2']

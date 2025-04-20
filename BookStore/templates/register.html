@@ -5,57 +5,144 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Register</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <style>
     body {
-      background-color: #F4F7FA;
-      height: 100vh;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
       margin: 0;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      padding: 30px 0;
     }
 
     .register-card {
       width: 100%;
-      max-width: 400px;
-      border-radius: 12px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      max-width: 450px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
       background-color: white;
-      padding: 20px;
+      padding: 30px;
       max-height: 90vh;
       display: flex;
       flex-direction: column;
+      transition: transform 0.3s ease;
+    }
+    
+    .register-card:hover {
+      transform: translateY(-5px);
     }
 
     .register-title {
-      color: #4A90E2;
-      font-size: 2rem;
+      color: #3a86ff;
+      font-size: 2.2rem;
+      font-weight: 700;
       text-align: center;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
     }
 
     .form-container {
       overflow-y: auto;
-      padding-right: 5px;
+      padding-right: 10px;
     }
 
     .form-container::-webkit-scrollbar {
-      width: 4px;
+      width: 6px;
     }
 
-    .form-container::-webkit-scrollbar-thumb {
-      background: #ccc;
+    .form-container::-webkit-scrollbar-track {
+      background: #f1f1f1;
       border-radius: 10px;
     }
 
+    .form-container::-webkit-scrollbar-thumb {
+      background: #3a86ff;
+      border-radius: 10px;
+    }
+
+    .form-container::-webkit-scrollbar-thumb:hover {
+      background: #0066ff;
+    }
+
+    .form-group label {
+      font-weight: 500;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    .form-control {
+      border-radius: 8px;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      border-color: #3a86ff;
+      box-shadow: 0 0 0 0.2rem rgba(58, 134, 255, 0.25);
+    }
+
     .btn-primary {
-      background-color: #50E3C2;
-      border-color: #50E3C2;
+      background: linear-gradient(135deg, #3a86ff 0%, #0066ff 100%);
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
     }
 
     .btn-primary:hover {
-      background-color: #45d3b1;
+      background: linear-gradient(135deg, #0066ff 0%, #0053cc 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 102, 255, 0.3);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #3a86ff;
+      border: 1px solid #3a86ff;
+      border-radius: 8px;
+      padding: 8px 15px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background-color: rgba(58, 134, 255, 0.1);
+      color: #0066ff;
+      border-color: #0066ff;
+    }
+    
+    .input-icon {
+      position: relative;
+    }
+    
+    .input-icon i {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      transform: translateY(-50%);
+      color: #aaa;
+    }
+    
+    .input-icon input {
+      padding-left: 40px;
+    }
+    
+    .alert {
+      border-radius: 8px;
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 15px;
+    }
+    
+    .form-row .form-group {
+      flex: 1;
     }
   </style>
 </head>
@@ -66,7 +153,7 @@
 
     {% if messages %}
       <div class="alert alert-danger">
-        <ul>
+        <ul class="mb-0">
           {% for message in messages %}
             <li>{{ message }}</li>
           {% endfor %}
@@ -78,29 +165,46 @@
       <form action="" method="POST">
         {% csrf_token %}
 
-        <div class="form-group">
-          <label for="first_name">First Name</label>
-          <input type="text" name="first_name" class="form-control" id="first_name" required>
-        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="first_name">First Name</label>
+            <div class="input-icon">
+              <i class="fas fa-user"></i>
+              <input type="text" name="first_name" class="form-control" id="first_name" required>
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label for="last_name">Last Name</label>
-          <input type="text" name="last_name" class="form-control" id="last_name" required>
+          <div class="form-group">
+            <label for="last_name">Last Name</label>
+            <div class="input-icon">
+              <i class="fas fa-user"></i>
+              <input type="text" name="last_name" class="form-control" id="last_name" required>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="username">Username</label>
-          <input type="text" name="username" class="form-control" id="username" required>
+          <div class="input-icon">
+            <i class="fas fa-user-circle"></i>
+            <input type="text" name="username" class="form-control" id="username" required>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="email">Email</label>
-          <input type="email" name="email" class="form-control" id="email" required>
+          <div class="input-icon">
+            <i class="fas fa-envelope"></i>
+            <input type="email" name="email" class="form-control" id="email" required>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="password1">Password</label>
-          <input type="password" name="password1" class="form-control" id="password1" required>
+          <div class="input-icon">
+            <i class="fas fa-lock"></i>
+            <input type="password" name="password1" class="form-control" id="password1" required>
+          </div>
           {% if password_strength %}
             <small class="form-text text-{% if password_valid %}success{% else %}danger{% endif %}">
               {{ password_strength }}
@@ -110,25 +214,37 @@
 
         <div class="form-group">
           <label for="password2">Confirm Password</label>
-          <input type="password" name="password2" class="form-control" id="password2" required>
+          <div class="input-icon">
+            <i class="fas fa-lock"></i>
+            <input type="password" name="password2" class="form-control" id="password2" required>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="phone">Phone Number</label>
-          <input type="text" name="phone" class="form-control" id="phone" required>
+          <div class="input-icon">
+            <i class="fas fa-phone"></i>
+            <input type="text" name="phone" class="form-control" id="phone" required>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="address">Address</label>
-          <input type="text" name="address" class="form-control" id="address" required>
+          <div class="input-icon">
+            <i class="fas fa-map-marker-alt"></i>
+            <input type="text" name="address" class="form-control" id="address" required>
+          </div>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block mt-3">Register</button>
+        <button type="submit" class="btn btn-primary btn-block mt-4">
+          <i class="fas fa-user-plus mr-2"></i>Register
+        </button>
 
         <div class="text-center mt-3">
-          <a href="{% url 'login' %}" class="btn btn-secondary">Already have an account? Login</a>
+          <a href="{% url 'login' %}" class="btn btn-secondary">
+            <i class="fas fa-sign-in-alt mr-2"></i>Already have an account? Login
+          </a>
         </div>
-
       </form>
     </div>
   </div>
