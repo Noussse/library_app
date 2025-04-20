@@ -8,28 +8,27 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <style>
     body {
-      background-color: #F4F7FA;
-      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
       padding: 30px 0;
     }
 
     .profile-card {
       max-width: 700px;
       margin: 0 auto;
-      border-radius: 12px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
       background-color: white;
-      color: #333;
       overflow: hidden;
     }
-    
+
     .profile-header {
-      background-color: #4A90E2;
+      background: linear-gradient(135deg, #3a86ff 0%, #0066ff 100%);
       color: white;
       padding: 2rem;
       text-align: center;
     }
-    
+
     .profile-header h1 {
       margin: 0;
       font-size: 2rem;
@@ -43,8 +42,6 @@
       background-color: #dee2e6;
       border: 5px solid white;
       margin: 0 auto;
-      position: relative;
-      z-index: 2;
     }
 
     .profile-pic-wrapper img {
@@ -52,21 +49,23 @@
       height: 100%;
       object-fit: cover;
     }
-    
+
     .profile-body {
       padding: 2rem;
     }
 
     .form-control {
-      border-radius: 6px;
-      margin-bottom: 1rem;
+      border-radius: 8px;
       border: 1px solid #ddd;
-      padding: 10px 15px;
+      padding: 12px 15px;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      transition: all 0.3s ease;
     }
-    
+
     .form-control:focus {
-      box-shadow: 0 0 0 0.2rem rgba(80, 227, 194, 0.25);
-      border-color: #50E3C2;
+      border-color: #3a86ff;
+      box-shadow: 0 0 0 0.2rem rgba(58, 134, 255, 0.25);
     }
 
     #profilePicInput {
@@ -76,8 +75,8 @@
     label[for="profilePicInput"] {
       display: inline-block;
       margin-top: 10px;
-      padding: 8px 16px;
-      background-color: #50E3C2;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #8ecae6 0%, #219ebc 100%);
       color: white;
       border-radius: 8px;
       cursor: pointer;
@@ -85,55 +84,65 @@
     }
 
     label[for="profilePicInput"]:hover {
-      background-color: #45d3b1;
+      background: linear-gradient(135deg, #219ebc 0%, #1a7a94 100%);
     }
-    
+
     .section-title {
       font-size: 1.2rem;
       font-weight: 600;
-      color: #4A90E2;
+      color: #3a86ff;
       margin-bottom: 15px;
       border-bottom: 1px solid #eee;
       padding-bottom: 5px;
     }
 
     .btn-success {
-      background-color: #4CAF50;
-      border-color: #4CAF50;
+      background: linear-gradient(135deg, #3a86ff 0%, #0066ff 100%);
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
     }
 
     .btn-success:hover {
-      background-color: #45a049;
+      background: linear-gradient(135deg, #0066ff 0%, #0053cc 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 102, 255, 0.3);
     }
 
     .btn-secondary {
-      background-color: #6c757d;
-      border-color: #6c757d;
+      background: linear-gradient(135deg, #8ecae6 0%, #219ebc 100%);
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
     }
-    
+
     .btn-secondary:hover {
-      background-color: #5a6268;
+      background: linear-gradient(135deg, #219ebc 0%, #1a7a94 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(33, 158, 188, 0.3);
     }
-    
+
     .action-buttons {
       margin-top: 20px;
     }
   </style>
 </head>
-<!-- ... head stays the same ... -->
-
 <body>
+
   <div class="container">
     <div class="profile-card">
       <div class="profile-header">
         <h1><i class="fas fa-user-edit mr-2"></i>Edit Profile</h1>
       </div>
-      
+
       <div class="profile-body">
         <form method="POST" enctype="multipart/form-data">
           {% csrf_token %}
 
-          <!-- Profile Picture Section -->
           <div class="text-center mb-4">
             <div class="profile-pic-wrapper mb-3">
               <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}https://via.placeholder.com/150?text=Profile+Pic{% endif %}" alt="Profile Picture">
@@ -142,70 +151,56 @@
             <label for="profilePicInput"><i class="fas fa-camera mr-2"></i>Change Picture</label>
           </div>
 
-          <!-- Editable Personal Details -->
           <div class="profile-details mt-4">
             <h4 class="section-title"><i class="fas fa-user-circle mr-2"></i>Personal Details</h4>
-            
-            <div class="form-group">
-              <label for="first_name">First Name</label>
-              <input type="text" id="first_name" name="first_name" class="form-control" value="{{ user.first_name }}" placeholder="First Name">
-            </div>
-            
-            <div class="form-group">
-              <label for="last_name">Last Name</label>
-              <input type="text" id="last_name" name="last_name" class="form-control" value="{{ user.last_name }}" placeholder="Last Name">
-            </div>
-            
-            <div class="form-group">
-              <label for="email">Email</label>
-              <input type="email" id="email" name="email" class="form-control" value="{{ user.email }}" placeholder="Email">
-            </div>
-            
-            <div class="form-group">
-              <label for="phone">Phone</label>
-              <input type="text" id="phone" name="phone" class="form-control" value="{{ user.phone }}" placeholder="Phone">
-            </div>
 
-            <div class="form-group">
-              <label for="address">Address</label>
-              <textarea id="address" name="address" class="form-control" rows="3" placeholder="Address">{{ user.address }}</textarea>
-            </div>
+            <label for="first_name">First Name</label>
+            <input type="text" id="first_name" name="first_name" class="form-control" value="{{ user.first_name }}" placeholder="First Name">
+
+            <label for="last_name">Last Name</label>
+            <input type="text" id="last_name" name="last_name" class="form-control" value="{{ user.last_name }}" placeholder="Last Name">
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" class="form-control" value="{{ user.email }}" placeholder="Email">
+
+            <label for="phone">Phone</label>
+            <input type="text" id="phone" name="phone" class="form-control" value="{{ user.phone }}" placeholder="Phone">
+
+            <label for="address">Address</label>
+            <textarea id="address" name="address" class="form-control" rows="3" placeholder="Address">{{ user.address }}</textarea>
           </div>
 
-          <!-- Editable Account Details -->
           <div class="profile-details mt-4">
             <h4 class="section-title"><i class="fas fa-user-shield mr-2"></i>Account Details</h4>
-            
-            <div class="form-group">
-              <label for="username">Username</label>
-              <input type="text" id="username" name="username" class="form-control" value="{{ user.username }}" placeholder="Username">
-            </div>
 
-            <div class="form-group">
-              <label for="password">New Password (Leave empty to keep current)</label>
-              <input type="password" id="password" name="password" class="form-control" placeholder="New Password">
-              <small class="form-text text-muted">Password must be at least 8 characters with letters, numbers, and symbols</small>
-            </div>
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" class="form-control" value="{{ user.username }}" placeholder="Username">
+
+            <label for="password">New Password</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="New Password">
+            <small class="form-text text-muted">Leave empty to keep current password.</small>
           </div>
 
-          <!-- Save Buttons -->
           <div class="action-buttons">
-            <button type="submit" class="btn btn-success btn-block mb-3"><i class="fas fa-save mr-2"></i>Save Changes</button>
-            
-            <a href="{% url 'profile' %}" class="btn btn-secondary btn-block"><i class="fas fa-times mr-2"></i>Cancel</a>
+            <button type="submit" class="btn btn-success btn-block mb-3">
+              <i class="fas fa-save mr-2"></i>Save Changes
+            </button>
+
+            <a href="{% url 'profile' %}" class="btn btn-secondary btn-block">
+              <i class="fas fa-times mr-2"></i>Cancel
+            </a>
           </div>
         </form>
       </div>
     </div>
   </div>
-  
+
   <!-- Bootstrap Scripts -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.5/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  
+
   <script>
-    // Preview uploaded image before submission
     document.getElementById('profilePicInput').addEventListener('change', function(event) {
       const file = event.target.files[0];
       if (file) {
