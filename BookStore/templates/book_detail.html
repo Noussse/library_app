@@ -30,23 +30,53 @@
                 </div>
                 <div class="card-body text-center">
                     <div class="d-grid gap-2 mb-3">
-                        <button class="btn btn-primary btn-lg" type="button">
-                            <i class="fas fa-shopping-cart me-2"></i> Add to Cart
-                        </button>
-                        <button class="btn btn-outline-secondary" type="button">
-                            <i class="far fa-bookmark me-2"></i> Save to Reading List
-                        </button>
+                        <form method="post" action="{% url 'add_to_cart' book.id %}">
+                            {% csrf_token %}
+                            <button class="btn btn-primary btn-lg w-100" type="submit">
+                                <i class="fas fa-shopping-cart me-2"></i> Add to Cart
+                            </button>
+                        </form>
+                        
+                        <form method="post" action="{% url 'toggle_reading_list' book.id %}">
+                            {% csrf_token %}
+                            <button class="btn btn-outline-secondary w-100" type="submit" title="Add to Reading List">
+                                <i class="far fa-bookmark me-2"></i> Save to Reading List
+                            </button>
+                        </form>
+                        
                     </div>
                     <div class="d-flex justify-content-center gap-2">
                         <button class="btn btn-sm btn-outline-dark">
                             <i class="fas fa-share-alt"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-dark">
-                            <i class="far fa-heart"></i>
-                        </button>
+                        <form method="post" action="{% url 'toggle_favorite' book.id %}">
+                            {% csrf_token %}
+                            <button class="btn btn-sm btn-outline-dark" type="submit" title="Add to Favorites">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </form>
+
+                        
+                        
+                        
                         <button class="btn btn-sm btn-outline-dark">
                             <i class="fas fa-download"></i>
                         </button>
+                        <!-- Check if the book is in the user's reading list -->
+                        {% if book in user.readinglist.books.all %}
+                        <form action="{% url 'remove_reading' book.id %}" method="post">
+                            {% csrf_token %}
+                            <button class="btn btn-outline-secondary w-100" type="submit">Remove from Reading List</button>
+                        </form>
+                        {% endif %}
+
+                        <!-- Check if the book is in the user's favorites -->
+                        {% if book in user.favorite.books.all %}
+                        <form action="{% url 'remove_favorite' book.id %}" method="post">
+                            {% csrf_token %}
+                            <button class="btn btn-outline-secondary w-100" type="submit">Remove from Favorites</button>
+                        </form>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -340,6 +370,22 @@
             {% endfor %}
         </div>
     </div>
+    <!-- Check if the book is in the user's reading list -->
+{% if book in user.readinglist.books.all %}
+<form action="{% url 'remove_reading' book.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Remove from Reading List</button>
+</form>
+{% endif %}
+
+<!-- Check if the book is in the user's favorites -->
+{% if book in user.favorite.books.all %}
+<form action="{% url 'remove_favorite' book.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Remove from Favorites</button>
+</form>
+{% endif %}
+
 </div>
 {% endblock %}
 

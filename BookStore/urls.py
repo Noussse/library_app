@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 
+
 urlpatterns = [
     path('register/', views.register_user, name='register'),
     path('login/', views.user_login, name='login'),
@@ -24,6 +25,15 @@ urlpatterns = [
     path('browse/', views.browse_books, name='browse_books'),
     path('books/', views.browse_books, name='browse_books'),
 
+    path('book/<int:book_id>/add-to-cart/', views.add_to_cart, name='add_to_cart'),
+    path('book/<int:book_id>/favorite/', views.favorite_book, name='favorite_book'),
+    path('book/<int:book_id>/toggle-reading-list/', views.toggle_reading_list, name='toggle_reading_list'),
+    path('book/<int:book_id>/toggle-favorite/', views.toggle_favorite, name='toggle_favorite'),
+    path('my-books/', views.my_books, name='my_books'),
+    path('book/<int:book_id>/remove-favorite/', views.remove_favorite, name='remove_favorite'),
+    path('book/<int:book_id>/remove-reading/', views.remove_reading, name='remove_reading'),
+    
+
+
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

@@ -39,3 +39,28 @@ class Book(models.Model):
     
     def __str__(self):
         return self.title
+    
+class Cart(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    books = models.ManyToManyField(Book)
+
+    def __str__(self):
+        return f"{self.user.username}'s Cart"
+
+
+    def __str__(self):
+        return f"{self.user.username}'s Likes"
+
+class Favorite(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    books = models.ManyToManyField(Book)
+
+    def __str__(self):
+        return f"{self.user.username}'s Favorites"
+    
+class ReadingList(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    books = models.ManyToManyField(Book)
+
+    def __str__(self):
+        return f"{self.user.username}'s Reading List"

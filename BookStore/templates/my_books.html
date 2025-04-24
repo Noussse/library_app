@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4">My Books</h1>
+    
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs mb-4" id="myBooksTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="reading-list-tab" data-bs-toggle="tab" data-bs-target="#reading-list" type="button" role="tab" aria-controls="reading-list" aria-selected="true">
+                Reading List
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="favorites-tab" data-bs-toggle="tab" data-bs-target="#favorites" type="button" role="tab" aria-controls="favorites" aria-selected="false">
+                Favorites
+            </button>
+        </li>
+    </ul>
+    
+    <!-- Tabs Content -->
+    <div class="tab-content" id="myBooksTabsContent">
+        <!-- Reading List Tab -->
+        <div class="tab-pane fade show active" id="reading-list" role="tabpanel" aria-labelledby="reading-list-tab">
+            {% if reading_list %}
+                <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+                    {% for book in reading_list %}
+                        {% include 'book_card.html' with book=book %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    Your reading list is empty. Start adding books to your reading list!
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Favorites Tab -->
+        <div class="tab-pane fade" id="favorites" role="tabpanel" aria-labelledby="favorites-tab">
+            {% if favorite_books %}
+                <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+                    {% for book in favorite_books %}
+                        {% include 'book_card.html' with book=book %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    You don't have any favorite books yet. Add some to your favorites!
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
