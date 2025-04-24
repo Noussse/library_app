@@ -370,22 +370,6 @@
             {% endfor %}
         </div>
     </div>
-    <!-- Check if the book is in the user's reading list -->
-{% if book in user.readinglist.books.all %}
-<form action="{% url 'remove_reading' book.id %}" method="post">
-    {% csrf_token %}
-    <button type="submit">Remove from Reading List</button>
-</form>
-{% endif %}
-
-<!-- Check if the book is in the user's favorites -->
-{% if book in user.favorite.books.all %}
-<form action="{% url 'remove_favorite' book.id %}" method="post">
-    {% csrf_token %}
-    <button type="submit">Remove from Favorites</button>
-</form>
-{% endif %}
-
 </div>
 {% endblock %}
 
