@@ -1,0 +1,54 @@
+<!-- templates/cart.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>Your Shopping Cart</h2>
+    {% if cart.books.all %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Book</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in cart.books.all %}
+                <tr>
+                    <td>
+                        {% if book.cover_image %}
+                            <img src="{{ book.cover_image.url }}" style="height: 50px;">
+                        {% elif book.cover_url %}
+                            <img src="{{ book.cover_url }}" style="height: 50px;">
+                        {% endif %}
+                    </td>
+                    <td>{{ book.title }}</td>
+                    <td>
+                        {% for author in book.authors.all %}
+                            {{ author.name }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <form action="{% url 'remove_from_cart' book.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="text-end">
+        <a href="#" class="btn btn-primary">Checkout</a>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        Your cart is empty. <a href="{% url 'browse_books' %}">Browse books</a> to add some!
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

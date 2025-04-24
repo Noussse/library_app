@@ -400,3 +400,16 @@ def remove_reading(request, book_id):
         reading_list.books.remove(book)
         messages.success(request, "Book removed from your reading list.")
     return redirect('book_detail', book_id=book.id)
+
+@login_required
+def view_cart(request):
+    cart = get_object_or_404(Cart, user=request.user)
+    return render(request, 'cart.html', {'cart': cart})
+
+@login_required
+def remove_from_cart(request, book_id):
+    cart = get_object_or_404(Cart, user=request.user)
+    book = get_object_or_404(Book, id=book_id)
+    cart.books.remove(book)
+    messages.success(request, "Book removed from your cart.")
+    return redirect('view_cart')

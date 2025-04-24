@@ -32,7 +32,8 @@ urlpatterns = [
     path('my-books/', views.my_books, name='my_books'),
     path('book/<int:book_id>/remove-favorite/', views.remove_favorite, name='remove_favorite'),
     path('book/<int:book_id>/remove-reading/', views.remove_reading, name='remove_reading'),
-    
+    path('cart/', views.view_cart, name='view_cart'),
+    path('cart/remove/<int:book_id>/', views.remove_from_cart, name='remove_from_cart'),
 
 
 ]
