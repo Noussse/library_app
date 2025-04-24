@@ -390,8 +390,7 @@ def remove_favorite(request, book_id):
     if book in favorite.books.all():
         favorite.books.remove(book)
         messages.success(request, "Book removed from your favorites.")
-    return redirect('my_books')
-
+    return redirect('book_detail', book_id=book.id)
 
 @login_required
 def remove_reading(request, book_id):
@@ -400,4 +399,4 @@ def remove_reading(request, book_id):
     if book in reading_list.books.all():
         reading_list.books.remove(book)
         messages.success(request, "Book removed from your reading list.")
-    return redirect('my_books')
+    return redirect('book_detail', book_id=book.id)
