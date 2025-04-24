@@ -1,54 +1,167 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Books - BookHub Library{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <h1 class="mb-4">My Books</h1>
-    
-    <!-- Tabs Navigation -->
-    <ul class="nav nav-tabs mb-4" id="myBooksTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="reading-list-tab" data-bs-toggle="tab" data-bs-target="#reading-list" type="button" role="tab" aria-controls="reading-list" aria-selected="true">
-                Reading List
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="favorites-tab" data-bs-toggle="tab" data-bs-target="#favorites" type="button" role="tab" aria-controls="favorites" aria-selected="false">
-                Favorites
-            </button>
-        </li>
-    </ul>
-    
-    <!-- Tabs Content -->
-    <div class="tab-content" id="myBooksTabsContent">
-        <!-- Reading List Tab -->
-        <div class="tab-pane fade show active" id="reading-list" role="tabpanel" aria-labelledby="reading-list-tab">
-            {% if reading_list %}
-                <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-                    {% for book in reading_list %}
-                        {% include 'book_card.html' with book=book %}
-                    {% endfor %}
+<div class="container my-5 min-vh-70">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">My Books</li>
+                </ol>
+            </nav>
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2 mb-0 fw-bold">My Books</h1>
+            </div>
+            
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-tabs mb-4" id="myBooksTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="reading-list-tab" data-bs-toggle="tab" data-bs-target="#reading-list" type="button" role="tab" aria-controls="reading-list" aria-selected="true">
+                        Reading List
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="favorites-tab" data-bs-toggle="tab" data-bs-target="#favorites" type="button" role="tab" aria-controls="favorites" aria-selected="false">
+                        Favorites
+                    </button>
+                </li>
+            </ul>
+            
+            <!-- Tabs Content -->
+            <div class="tab-content" id="myBooksTabsContent">
+                <!-- Reading List Tab -->
+                <div class="tab-pane fade show active" id="reading-list" role="tabpanel" aria-labelledby="reading-list-tab">
+                    {% if reading_list %}
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                        {% for book in reading_list %}
+                        <div class="col">
+                            <div class="card h-100 border-0 shadow-sm book-card">
+                                <a href="{% url 'book_detail' book.id %}" class="text-decoration-none">
+                                    <div class="position-relative book-cover-wrapper">
+                                        <div class="book-cover-container">
+                                            {% if book.cover_image %}
+                                            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="book-cover">
+                                            {% elif book.cover_url %}
+                                            <img src="{{ book.cover_url }}" alt="{{ book.title }}" class="book-cover">
+                                            {% else %}
+                                            <img src="{% static 'library/images/default-cover.jpg' %}" alt="{{ book.title }}" class="book-cover">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <h6 class="card-title fw-bold mb-1 text-truncate">{{ book.title }}</h6>
+                                        <p class="card-text text-muted small mb-0">
+                                            {% for author in book.authors.all %}
+                                            {{ author.name }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        Your reading list is empty. Start adding books to your reading list!
+                    </div>
+                    {% endif %}
                 </div>
-            {% else %}
-                <div class="alert alert-info">
-                    Your reading list is empty. Start adding books to your reading list!
+                
+                <!-- Favorites Tab -->
+                <div class="tab-pane fade" id="favorites" role="tabpanel" aria-labelledby="favorites-tab">
+                    {% if favorite_books %}
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                        {% for book in favorite_books %}
+                        <div class="col">
+                            <div class="card h-100 border-0 shadow-sm book-card">
+                                <a href="{% url 'book_detail' book.id %}" class="text-decoration-none">
+                                    <div class="position-relative book-cover-wrapper">
+                                        <div class="book-cover-container">
+                                            {% if book.cover_image %}
+                                            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="book-cover">
+                                            {% elif book.cover_url %}
+                                            <img src="{{ book.cover_url }}" alt="{{ book.title }}" class="book-cover">
+                                            {% else %}
+                                            <img src="{% static 'library/images/default-cover.jpg' %}" alt="{{ book.title }}" class="book-cover">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <h6 class="card-title fw-bold mb-1 text-truncate">{{ book.title }}</h6>
+                                        <p class="card-text text-muted small mb-0">
+                                            {% for author in book.authors.all %}
+                                            {{ author.name }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        You don't have any favorite books yet. Add some to your favorites!
+                    </div>
+                    {% endif %}
                 </div>
-            {% endif %}
-        </div>
-        
-        <!-- Favorites Tab -->
-        <div class="tab-pane fade" id="favorites" role="tabpanel" aria-labelledby="favorites-tab">
-            {% if favorite_books %}
-                <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-                    {% for book in favorite_books %}
-                        {% include 'book_card.html' with book=book %}
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="alert alert-info">
-                    You don't have any favorite books yet. Add some to your favorites!
-                </div>
-            {% endif %}
+            </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Minimum page height */
+    .min-vh-70 {
+        min-height: 70vh;
+    }
+    
+    /* Book card styling */
+    .book-card {
+        transition: all 0.3s ease;
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    
+    .book-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+    }
+    
+    /* Book cover container */
+    .book-cover-wrapper {
+        height: 220px;
+        overflow: hidden;
+        background-color: #f8f9fa;
+    }
+    
+    .book-cover-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .book-cover {
+        width: auto;
+        height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+        transition: all 0.3s ease;
+    }
+    
+    .book-card:hover .book-cover {
+        transform: scale(1.05);
+    }
+</style>
 {% endblock %}
