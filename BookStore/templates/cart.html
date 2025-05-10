@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Shopping Cart - BookHub Library{% endblock %}
+
+{% block content %}
+<div class="container my-5 min-vh-70">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Shopping Cart</li>
+                </ol>
+            </nav>
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2 mb-0 fw-bold">Your Shopping Cart</h1>
+                {% if cart.books.all %}
+                <span class="badge bg-primary rounded-pill fs-6">{{ cart.books.all|length }} item{{ cart.books.all|length|pluralize }}</span>
+                {% endif %}
+            </div>
+            
+            {% if cart.books.all %}
+            <div class="card border-0 shadow-lg rounded-3 mb-4">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" class="py-3">Book</th>
+                                    <th scope="col" class="py-3">Title</th>
+                                    <th scope="col" class="py-3">Author</th>
+                                    <th scope="col" class="py-3 text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for book in cart.books.all %}
+                                <tr>
+                                    <td class="align-middle py-3">
+                                        <div class="cart-book-cover rounded shadow-sm">
+                                            {% if book.cover_image %}
+                                            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="img-fluid">
+                                            {% elif book.cover_url %}
+                                            <img src="{{ book.cover_url }}" alt="{{ book.title }}" class="img-fluid">
+                                            {% else %}
+                                            <img src="{% static 'library/images/default-cover.jpg' %}" alt="{{ book.title }}" class="img-fluid">
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td class="align-middle py-3">
+                                        <a href="{% url 'book_detail' book.id %}" class="text-decoration-none fw-bold">{{ book.title }}</a>
+                                    </td>
+                                    <td class="align-middle py-3">
+                                        {% for author in book.authors.all %}
+                                        <a href="#" class="text-decoration-none text-muted">{{ author.name }}</a>{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    <td class="align-middle text-end py-3">
+                                        <form action="{% url 'remove_from_cart' book.id %}" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill">
+                                                <i class="fas fa-trash-alt me-1"></i> Remove
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow-lg rounded-3 mb-4">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3 mb-md-0">
+                                <div class="me-3">
+                                    <i class="fas fa-shield-alt text-success fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-0 fw-bold">Secure Checkout</h5>
+                                    <p class="text-muted mb-0">Your transaction is protected with SSL encryption</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center justify-content-md-end">
+                                <a href="{% url 'browse_books' %}" class="btn btn-outline-secondary me-2">
+                                    <i class="fas fa-arrow-left me-2"></i> Continue Shopping
+                                </a>
+                                <a href="#" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-lock me-2"></i> Checkout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% else %}
+            <div class="card border-0 shadow-lg rounded-3 py-5">
+                <div class="card-body text-center p-5">
+                    <div class="empty-cart-icon mb-4">
+                        <i class="fas fa-shopping-cart fa-5x text-muted opacity-50"></i>
+                    </div>
+                    <h3 class="mb-3">Your cart is empty</h3>
+                    <p class="text-muted mb-4">Looks like you haven't added any books to your cart yet.</p>
+                    <a href="{% url 'browse_books' %}" class="btn btn-primary btn-lg px-5">
+                        <i class="fas fa-book me-2"></i> Browse Books
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Ensure minimum page height to prevent footer from appearing in middle of screen */
+    .min-vh-70 {
+        min-height: 70vh;
+    }
+    
+    /* Cart book cover styles */
+    .cart-book-cover {
+        width: 60px;
+        height: 80px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .cart-book-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .cart-book-cover:hover {
+        transform: scale(1.05);
+    }
+    
+    /* Empty cart icon animation */
+    .empty-cart-icon {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% {
+            transform: scale(0.95);
+            opacity: 0.7;
+        }
+        50% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(0.95);
+            opacity: 0.7;
+        }
+    }
+</style>
+{% endblock %}

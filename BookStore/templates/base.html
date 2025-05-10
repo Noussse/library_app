@@ -169,6 +169,46 @@
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
+                    <!-- Add this to your base.html in the navbar section, right before the user dropdown -->
+{% if user.is_authenticated %}
+<div class="dropdown me-3">
+    <button class="btn btn-outline-light position-relative" type="button" id="cartDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fas fa-shopping-cart"></i>
+        {% if cart_count > 0 %}
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            {{ cart_count }}
+        </span>
+        {% endif %}
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="cartDropdown" style="min-width: 300px;">
+        <li class="dropdown-header">Your Cart</li>
+        {% if cart_items %}
+            {% for item in cart_items %}
+            <li class="dropdown-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0">{{ item.book.title }}</h6>
+                        <small class="text-muted">{{ item.book.authors.first.name }}</small>
+                    </div>
+                    <form action="{% url 'remove_from_cart' item.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </form>
+                </div>
+            </li>
+            {% endfor %}
+            <li><hr class="dropdown-divider"></li>
+            <li class="dropdown-item">
+                <a href="{% url 'view_cart' %}" class="btn btn-primary w-100">View Cart</a>
+            </li>
+        {% else %}
+            <li class="dropdown-item text-muted">Your cart is empty</li>
+        {% endif %}
+    </ul>
+</div>
+{% endif %}
                     {% if user.is_authenticated %}
                     <div class="dropdown">
                         <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -176,7 +216,9 @@
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
-                            <li><a class="dropdown-item" href="#">My Books</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'my_books' %}">My Books</a>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
                         </ul>

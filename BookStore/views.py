@@ -14,6 +14,9 @@ from .forms import UserUpdateForm
 from .utils import check_password_strength
 from django.db import models
 from BookStore.models import CustomUser  # Replace 'your_app' with your actual app name
+from .models import Cart, Favorite
+from .models import ReadingList
+
 
 
 User = get_user_model()  # Custom user model
@@ -307,3 +310,106 @@ def browse_books(request):
     }
    
     return render(request, 'browse_books.html', context)
+
+@login_required
+def add_to_cart(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    cart, _ = Cart.objects.get_or_create(user=request.user)
+    cart.books.add(book)
+    messages.success(request, "Book added to your cart.")
+    return redirect('book_detail', book_id=book.id)
+
+
+@login_required
+def favorite_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    fav, _ = Favorite.objects.get_or_create(user=request.user)
+    fav.books.add(book)
+    messages.success(request, "Book added to favorites.")
+    return redirect('book_detail', book_id=book.id)
+
+@login_required
+def toggle_reading_list(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    # Get or create the ReadingList for the current user
+    reading_list, created = ReadingList.objects.get_or_create(user=request.user)
+
+    # Toggle the book in the reading list
+    if book in reading_list.books.all():
+        reading_list.books.remove(book)
+        messages.success(request, "Book removed from your reading list.")
+    else:
+        reading_list.books.add(book)
+        messages.success(request, "Book added to your reading list.")
+
+    return redirect('book_detail', book_id=book.id)
+
+@login_required
+def toggle_favorite(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    
+    # Get or create the Favorite list for the current user
+    favorite, created = Favorite.objects.get_or_create(user=request.user)
+
+    # Toggle the book in the favorites list
+    if book in favorite.books.all():
+        favorite.books.remove(book)
+        messages.success(request, "Book removed from your favorites.")
+    else:
+        favorite.books.add(book)
+        messages.success(request, "Book added to your favorites.")
+
+    return redirect('book_detail', book_id=book.id)
+
+@login_required
+def my_books(request):
+
+    # Get the user's reading list
+    try:
+        reading_list = ReadingList.objects.get(user=request.user).books.all()
+    except ReadingList.DoesNotExist:
+        reading_list = []
+    
+    # Get the user's favorites
+    try:
+        favorite_books = Favorite.objects.get(user=request.user).books.all()
+    except Favorite.DoesNotExist:
+        favorite_books = []
+    
+    context = {
+        'reading_list': reading_list,
+        'favorite_books': favorite_books,
+    }
+    
+    return render(request, 'my_books.html', context)
+
+@login_required
+def remove_favorite(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    favorite, created = Favorite.objects.get_or_create(user=request.user)
+    if book in favorite.books.all():
+        favorite.books.remove(book)
+        messages.success(request, "Book removed from your favorites.")
+    return redirect('book_detail', book_id=book.id)
+
+@login_required
+def remove_reading(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    reading_list, created = ReadingList.objects.get_or_create(user=request.user)
+    if book in reading_list.books.all():
+        reading_list.books.remove(book)
+        messages.success(request, "Book removed from your reading list.")
+    return redirect('book_detail', book_id=book.id)
+
+@login_required
+def view_cart(request):
+    cart = get_object_or_404(Cart, user=request.user)
+    return render(request, 'cart.html', {'cart': cart})
+
+@login_required
+def remove_from_cart(request, book_id):
+    cart = get_object_or_404(Cart, user=request.user)
+    book = get_object_or_404(Book, id=book_id)
+    cart.books.remove(book)
+    messages.success(request, "Book removed from your cart.")
+    return redirect('view_cart')
