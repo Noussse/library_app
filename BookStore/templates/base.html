@@ -162,63 +162,27 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">Home</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link {% if request.resolver_match.url_name == 'browse_books' %}active{% endif %}" href="{% url 'browse_books' %}">Browse</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
-                    <!-- Add this to your base.html in the navbar section, right before the user dropdown -->
-{% if user.is_authenticated %}
-<div class="dropdown me-3">
-    <button class="btn btn-outline-light position-relative" type="button" id="cartDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="fas fa-shopping-cart"></i>
-        {% if cart_count > 0 %}
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            {{ cart_count }}
-        </span>
-        {% endif %}
-    </button>
-    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="cartDropdown" style="min-width: 300px;">
-        <li class="dropdown-header">Your Cart</li>
-        {% if cart_items %}
-            {% for item in cart_items %}
-            <li class="dropdown-item">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="mb-0">{{ item.book.title }}</h6>
-                        <small class="text-muted">{{ item.book.authors.first.name }}</small>
-                    </div>
-                    <form action="{% url 'remove_from_cart' item.id %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </form>
-                </div>
-            </li>
-            {% endfor %}
-            <li><hr class="dropdown-divider"></li>
-            <li class="dropdown-item">
-                <a href="{% url 'view_cart' %}" class="btn btn-primary w-100">View Cart</a>
-            </li>
-        {% else %}
-            <li class="dropdown-item text-muted">Your cart is empty</li>
-        {% endif %}
-    </ul>
-</div>
-{% endif %}
                     {% if user.is_authenticated %}
+                    <a href="{% url 'view_cart' %}" class="btn btn-outline-light position-relative me-3">
+                        <i class="fas fa-shopping-cart"></i>
+                        {% if cart_count > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ cart_count }}
+                        </span>
+                        {% endif %}
+                    </a>
+                    
                     <div class="dropdown">
                         <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             {{ user.username }}
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'my_books' %}">My Books</a>
-                            </li>
+                            <li><a class="dropdown-item" href="{% url 'my_books' %}">My Books</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
                         </ul>
@@ -263,7 +227,6 @@
                         <li><a href="{% url 'login' %}" class="text-white">Log In</a></li>
                         <li><a href="{% url 'register' %}" class="text-white">Sign Up</a></li>
                         <li><a href="{% url 'profile' %}" class="text-white">Profile</a></li>
-                    
                     </ul>
                 </div>
                 <div class="col-lg-4 col-md-4">

@@ -1,256 +1,221 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Register</title>
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-  <style>
-    body {
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      min-height: 100vh;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-      padding: 30px 0;
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}BookHub Library - Register{% endblock %}
+
+{% block extra_css %}
+<style>
+    .register-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        padding: 40px 0;
     }
 
     .register-card {
-      width: 100%;
-      max-width: 450px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-      background-color: white;
-      padding: 30px;
-      max-height: 90vh;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.3s ease;
+        width: 100%;
+        max-width: 500px;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        background-color: white;
+        padding: 35px;
+        transition: transform 0.3s ease;
     }
     
     .register-card:hover {
-      transform: translateY(-5px);
+        transform: translateY(-5px);
     }
 
     .register-title {
-      color: #3a86ff;
-      font-size: 2.2rem;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .form-container {
-      overflow-y: auto;
-      padding-right: 10px;
-    }
-
-    .form-container::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .form-container::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 10px;
-    }
-
-    .form-container::-webkit-scrollbar-thumb {
-      background: #3a86ff;
-      border-radius: 10px;
-    }
-
-    .form-container::-webkit-scrollbar-thumb:hover {
-      background: #0066ff;
+        color: var(--bs-primary, #0d6efd);
+        font-size: 2.2rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 25px;
     }
 
     .form-group label {
-      font-weight: 500;
-      color: #555;
-      margin-bottom: 8px;
+        font-weight: 500;
+        color: #555;
+        margin-bottom: 8px;
     }
 
     .form-control {
-      border-radius: 8px;
-      padding: 12px 15px;
-      border: 1px solid #ddd;
-      transition: all 0.3s ease;
+        border-radius: 8px;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        transition: all 0.3s ease;
+        font-size: 1rem;
     }
 
     .form-control:focus {
-      border-color: #3a86ff;
-      box-shadow: 0 0 0 0.2rem rgba(58, 134, 255, 0.25);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #3a86ff 0%, #0066ff 100%);
-      border: none;
-      border-radius: 8px;
-      padding: 12px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      transition: all 0.3s ease;
-    }
-
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #0066ff 0%, #0053cc 100%);
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 102, 255, 0.3);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: #3a86ff;
-      border: 1px solid #3a86ff;
-      border-radius: 8px;
-      padding: 8px 15px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-    }
-
-    .btn-secondary:hover {
-      background-color: rgba(58, 134, 255, 0.1);
-      color: #0066ff;
-      border-color: #0066ff;
+        border-color: var(--bs-primary, #0d6efd);
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
     }
     
     .input-icon {
-      position: relative;
+        position: relative;
     }
     
     .input-icon i {
-      position: absolute;
-      top: 50%;
-      left: 15px;
-      transform: translateY(-50%);
-      color: #aaa;
+        position: absolute;
+        top: 50%;
+        left: 15px;
+        transform: translateY(-50%);
+        color: #aaa;
     }
     
     .input-icon input {
-      padding-left: 40px;
+        padding-left: 40px;
     }
-    
-    .alert {
-      border-radius: 8px;
+
+    .btn-register {
+        padding: 12px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-login {
+        border-radius: 30px;
+        padding: 8px 18px;
+        font-weight: 500;
     }
     
     .form-row {
-      display: flex;
-      gap: 15px;
+        display: flex;
+        gap: 15px;
+        margin-bottom: 1rem;
     }
     
     .form-row .form-group {
-      flex: 1;
+        flex: 1;
+        margin-bottom: 0;
     }
-  </style>
-</head>
-<body>
+    
+    .form-container {
+        max-height: 60vh;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
 
-  <div class="register-card">
-    <h2 class="register-title">Register</h2>
+    .form-container::-webkit-scrollbar {
+        width: 6px;
+    }
 
-    {% if messages %}
-      <div class="alert alert-danger">
-        <ul class="mb-0">
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-        </ul>
-      </div>
-    {% endif %}
+    .form-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
 
-    <div class="form-container">
-      <form action="" method="POST">
-        {% csrf_token %}
+    .form-container::-webkit-scrollbar-thumb {
+        background: var(--bs-primary, #0d6efd);
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="first_name">First Name</label>
-            <div class="input-icon">
-              <i class="fas fa-user"></i>
-              <input type="text" name="first_name" class="form-control" id="first_name" required>
-            </div>
-          </div>
+{% block content %}
+<div class="register-container">
+    <div class="register-card">
+        <h2 class="register-title">Register</h2>
 
-          <div class="form-group">
-            <label for="last_name">Last Name</label>
-            <div class="input-icon">
-              <i class="fas fa-user"></i>
-              <input type="text" name="last_name" class="form-control" id="last_name" required>
-            </div>
-          </div>
+        {% if messages %}
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
         </div>
+        {% endif %}
 
-        <div class="form-group">
-          <label for="username">Username</label>
-          <div class="input-icon">
-            <i class="fas fa-user-circle"></i>
-            <input type="text" name="username" class="form-control" id="username" required>
-          </div>
+        <div class="form-container">
+            <form action="" method="POST">
+                {% csrf_token %}
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first_name">First Name</label>
+                        <div class="input-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" name="first_name" class="form-control" id="first_name" placeholder="First Name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="last_name">Last Name</label>
+                        <div class="input-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" name="last_name" class="form-control" id="last_name" placeholder="Last Name" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-icon">
+                        <i class="fas fa-user-circle"></i>
+                        <input type="text" name="username" class="form-control" id="username" placeholder="Choose a username" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <div class="input-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" name="email" class="form-control" id="email" placeholder="Enter your email" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password1">Password</label>
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="password1" class="form-control" id="password1" placeholder="Create a password" required>
+                    </div>
+                    {% if password_strength %}
+                    <small class="form-text text-{% if password_valid %}success{% else %}danger{% endif %}">
+                        {{ password_strength }}
+                    </small>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="password2">Confirm Password</label>
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="password2" class="form-control" id="password2" placeholder="Confirm your password" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <div class="input-icon">
+                        <i class="fas fa-phone"></i>
+                        <input type="text" name="phone" class="form-control" id="phone" placeholder="Enter your phone number" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <div class="input-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <input type="text" name="address" class="form-control" id="address" placeholder="Enter your address" required>
+                    </div>
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary btn-block btn-register">
+                    <i class="fas fa-user-plus me-2"></i>Register
+                </button>
+
+                <div class="text-center mt-4">
+                    <a href="{% url 'login' %}" class="btn btn-outline-primary btn-login">
+                        <i class="fas fa-sign-in-alt me-2"></i>Already have an account? Login
+                    </a>
+                </div>
+            </form>
         </div>
-
-        <div class="form-group">
-          <label for="email">Email</label>
-          <div class="input-icon">
-            <i class="fas fa-envelope"></i>
-            <input type="email" name="email" class="form-control" id="email" required>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="password1">Password</label>
-          <div class="input-icon">
-            <i class="fas fa-lock"></i>
-            <input type="password" name="password1" class="form-control" id="password1" required>
-          </div>
-          {% if password_strength %}
-            <small class="form-text text-{% if password_valid %}success{% else %}danger{% endif %}">
-              {{ password_strength }}
-            </small>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label for="password2">Confirm Password</label>
-          <div class="input-icon">
-            <i class="fas fa-lock"></i>
-            <input type="password" name="password2" class="form-control" id="password2" required>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="phone">Phone Number</label>
-          <div class="input-icon">
-            <i class="fas fa-phone"></i>
-            <input type="text" name="phone" class="form-control" id="phone" required>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="address">Address</label>
-          <div class="input-icon">
-            <i class="fas fa-map-marker-alt"></i>
-            <input type="text" name="address" class="form-control" id="address" required>
-          </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-block mt-4">
-          <i class="fas fa-user-plus mr-2"></i>Register
-        </button>
-
-        <div class="text-center mt-3">
-          <a href="{% url 'login' %}" class="btn btn-secondary">
-            <i class="fas fa-sign-in-alt mr-2"></i>Already have an account? Login
-          </a>
-        </div>
-      </form>
     </div>
-  </div>
-
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.5/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+</div>
+{% endblock %}

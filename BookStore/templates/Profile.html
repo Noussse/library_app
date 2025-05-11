@@ -1,299 +1,240 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>User Profile</title>
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-  <style>
-    body {
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-      padding: 40px 0;
-    }
+{% extends 'base.html' %}
+{% load static %}
 
+{% block title %}BookHub Library - User Profile{% endblock %}
+
+{% block extra_css %}
+<style>
     .profile-card {
-      max-width: 750px;
-      margin: 0 auto;
-      border-radius: 20px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-      background-color: white;
-      color: #333;
-      overflow: hidden;
-      transition: transform 0.3s ease;
+        max-width: 750px;
+        margin: 30px auto;
+        border-radius: 15px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        background-color: white;
+        color: #333;
+        overflow: hidden;
+        transition: transform 0.3s ease;
     }
     
     .profile-card:hover {
-      transform: translateY(-5px);
+        transform: translateY(-5px);
     }
     
     .profile-header {
-      background: linear-gradient(135deg, #3a86ff 0%, #0066ff 100%);
-      color: white;
-      padding: 2.5rem;
-      position: relative;
-      text-align: center;
+        background: var(--bs-primary, #0d6efd);
+        color: white;
+        padding: 2.5rem;
+        position: relative;
+        text-align: center;
     }
 
     .profile-header::after {
-      content: '';
-      position: absolute;
-      bottom: -30px;
-      left: 0;
-      width: 100%;
-      height: 60px;
-      background: white;
-      border-radius: 100% 100% 0 0;
+        content: '';
+        position: absolute;
+        bottom: -30px;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        background: white;
+        border-radius: 100% 100% 0 0;
     }
 
     .profile-pic-wrapper {
-      width: 160px;
-      height: 160px;
-      border-radius: 50%;
-      overflow: hidden;
-      background-color: #f8f9fa;
-      border: 6px solid white;
-      margin: 0 auto;
-      position: relative;
-      z-index: 2;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-      transition: transform 0.3s ease;
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        overflow: hidden;
+        background-color: #f8f9fa;
+        border: 6px solid white;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease;
     }
     
     .profile-pic-wrapper:hover {
-      transform: scale(1.05);
+        transform: scale(1.05);
     }
 
     .profile-pic-wrapper img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
     
     .profile-name {
-      text-align: center;
-      margin-top: 15px;
-      font-size: 1.8rem;
-      font-weight: 600;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        text-align: center;
+        margin-top: 15px;
+        font-size: 1.8rem;
+        font-weight: 600;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
     }
     
     .profile-body {
-      padding: 2.5rem;
+        padding: 2.5rem;
     }
 
     .info-section {
-      margin-bottom: 30px;
-      background-color: #f8f9fa;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-      transition: all 0.3s ease;
+        margin-bottom: 30px;
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
     }
     
     .info-section:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     }
     
     .section-title {
-      font-size: 1.3rem;
-      font-weight: 600;
-      color: #3a86ff;
-      margin-bottom: 18px;
-      border-bottom: 2px solid #e9ecef;
-      padding-bottom: 10px;
-      position: relative;
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--bs-primary, #0d6efd);
+        margin-bottom: 18px;
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 10px;
+        position: relative;
     }
     
     .section-title::after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 0;
-      width: 60px;
-      height: 2px;
-      background-color: #3a86ff;
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 60px;
+        height: 2px;
+        background-color: var(--bs-primary, #0d6efd);
     }
     
     .info-row {
-      display: flex;
-      margin-bottom: 12px;
-      align-items: center;
+        display: flex;
+        margin-bottom: 12px;
+        align-items: center;
     }
     
     .info-label {
-      font-weight: 500;
-      width: 130px;
-      color: #495057;
-      position: relative;
+        font-weight: 500;
+        width: 130px;
+        color: #495057;
+        position: relative;
     }
     
     .info-label::after {
-      content: ':';
-      position: absolute;
-      right: 10px;
+        content: ':';
+        position: absolute;
+        right: 10px;
     }
     
     .info-value {
-      flex: 1;
-      color: #212529;
-      font-weight: 400;
-      padding-left: 5px;
+        flex: 1;
+        color: #212529;
+        font-weight: 400;
+        padding-left: 5px;
     }
     
     .action-buttons {
-      display: flex;
-      gap: 15px;
-      margin-top: 25px;
-    }
-    
-    .btn {
-      border-radius: 10px;
-      padding: 12px 20px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    
-    .btn-edit {
-      background: linear-gradient(135deg, #00c9a7 0%, #00b2a4 100%);
-      border: none;
-      color: white;
-      flex: 1;
-    }
-    
-    .btn-edit:hover {
-      background: linear-gradient(135deg, #00b2a4 0%, #009e92 100%);
-      box-shadow: 0 5px 15px rgba(0, 194, 167, 0.3);
-      transform: translateY(-2px);
-    }
-    
-    .btn-home {
-      background: linear-gradient(135deg, #3a86ff 0%, #0066ff 100%);
-      border: none;
-      color: white;
-      flex: 1;
-    }
-    
-    .btn-home:hover {
-      background: linear-gradient(135deg, #0066ff 0%, #0053cc 100%);
-      box-shadow: 0 5px 15px rgba(0, 102, 255, 0.3);
-      transform: translateY(-2px);
-    }
-    
-    .btn-logout {
-      background: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%);
-      border: none;
-      color: white;
-      flex: 1;
-    }
-    
-    .btn-logout:hover {
-      background: linear-gradient(135deg, #ee5253 0%, #d92027 100%);
-      box-shadow: 0 5px 15px rgba(238, 82, 83, 0.3);
-      transform: translateY(-2px);
+        display: flex;
+        gap: 15px;
+        margin-top: 25px;
     }
     
     .icon-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background-color: rgba(255, 255, 255, 0.2);
-      margin-right: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: rgba(0, 0, 0, 0.1);
+        margin-right: 10px;
     }
-  </style>
-</head>
-<body>
+</style>
+{% endblock %}
 
-  <div class="container">
+{% block content %}
+<div class="container">
     <div class="profile-card">
-      <div class="profile-header">
-        <!-- Profile Picture -->
-        <div class="profile-pic-wrapper">
-          <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}https://via.placeholder.com/150?text=Profile+Pic{% endif %}" alt="Profile Picture">
+        <div class="profile-header">
+            <!-- Profile Picture -->
+            <div class="profile-pic-wrapper">
+                <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}/api/placeholder/160/160{% endif %}" alt="Profile Picture">
+            </div>
+            <!-- Username -->
+            <div class="profile-name">
+                {{ user.username }}
+            </div>
         </div>
-        <!-- Username -->
-        <div class="profile-name">
-          {{ user.username }}
-        </div>
-      </div>
       
-      <div class="profile-body">
-        <!-- Personal Details Section -->
-        <div class="info-section">
-          <h4 class="section-title">
-            <span class="icon-badge"><i class="fas fa-user-circle"></i></span>
-            Personal Details
-          </h4>
-          
-          <div class="info-row">
-            <div class="info-label">Full Name</div>
-            <div class="info-value">{{ user.first_name }} {{ user.last_name }}</div>
-          </div>
-          
-          <div class="info-row">
-            <div class="info-label">Phone</div>
-            <div class="info-value">{{ user.phone|default:"Not specified" }}</div>
-          </div>
-          
-          <div class="info-row">
-            <div class="info-label">Address</div>
-            <div class="info-value">{{ user.address|default:"Not specified" }}</div>
-          </div>
-        </div>
+        <div class="profile-body">
+            <!-- Personal Details Section -->
+            <div class="info-section">
+                <h4 class="section-title">
+                    <span class="icon-badge"><i class="fas fa-user-circle"></i></span>
+                    Personal Details
+                </h4>
+              
+                <div class="info-row">
+                    <div class="info-label">Full Name</div>
+                    <div class="info-value">{{ user.first_name }} {{ user.last_name }}</div>
+                </div>
+              
+                <div class="info-row">
+                    <div class="info-label">Phone</div>
+                    <div class="info-value">{{ user.phone|default:"Not specified" }}</div>
+                </div>
+              
+                <div class="info-row">
+                    <div class="info-label">Address</div>
+                    <div class="info-value">{{ user.address|default:"Not specified" }}</div>
+                </div>
+            </div>
 
-        <!-- Account Details Section -->
-        <div class="info-section">
-          <h4 class="section-title">
-            <span class="icon-badge"><i class="fas fa-user-shield"></i></span>
-            Account Details
-          </h4>
-          
-          <div class="info-row">
-            <div class="info-label">Username</div>
-            <div class="info-value">{{ user.username }}</div>
-          </div>
-          
-          <div class="info-row">
-            <div class="info-label">Email</div>
-            <div class="info-value">{{ user.email|default:"Not specified" }}</div>
-          </div>
-        </div>
+            <!-- Account Details Section -->
+            <div class="info-section">
+                <h4 class="section-title">
+                    <span class="icon-badge"><i class="fas fa-user-shield"></i></span>
+                    Account Details
+                </h4>
+              
+                <div class="info-row">
+                    <div class="info-label">Username</div>
+                    <div class="info-value">{{ user.username }}</div>
+                </div>
+              
+                <div class="info-row">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">{{ user.email|default:"Not specified" }}</div>
+                </div>
+            </div>
 
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-          <a href="{% url 'edit_profile' %}" class="btn btn-edit">
-            <i class="fas fa-user-edit"></i>
-            Edit Profile
-          </a>
-          <a href="{% url 'home' %}" class="btn btn-home">
-            <i class="fas fa-home"></i>
-            Home
-          </a>
-          <form action="{% url 'logout' %}" method="POST" style="flex: 1;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-logout w-100">
-              <i class="fas fa-sign-out-alt"></i>
-              Logout
-            </button>
-          </form>
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="{% url 'edit_profile' %}" class="btn btn-primary">
+                    <i class="fas fa-user-edit"></i>
+                    Edit Profile
+                </a>
+                <a href="{% url 'home' %}" class="btn btn-secondary">
+                    <i class="fas fa-home"></i>
+                    Home
+                </a>
+                <form action="{% url 'logout' %}" method="POST" style="flex: 1;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </button>
+                </form>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
+{% endblock %}
 
-  <!-- Bootstrap Scripts -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.5/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-</body>
-</html>
+{% block extra_js %}
+<script>
+    // Any additional JavaScript for the profile page can go here
+</script>
+{% endblock %}
